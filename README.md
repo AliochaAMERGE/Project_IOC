@@ -10,15 +10,21 @@ TODO :
 - Sur le raspberry
 
   - creer un serveur local sur le raspberry en python
+    - lecture d'un capteur et affichage de sa valeurs
+    - écriture sur un capteur
     - creer un site vitrine sur ce serveur 
+      - nous y afficherons au début les valeurs des capteurs apres une requete.
     - creer une base de donnée sqlite simple contenant une unique table, pour l'historique des capteurs (date, capteur, valeur)
     - javascript : actualisation constante des valeurs d'un capteur
     - ouvrir le serveur pour un acces non local
 
 - Sur l'ESP32
-  - brancher Led et ou photorésistance
+
+  - brancher Led et ou photorésistance, et ou bouton (tout ce qu'on a en fait)
   - connecter au raspberry via wifi
 
 - Sur le pc
+
   - rien pour le moment, on ouvrira juste l'url du serveur (local dans un premier temps)
   - configurer l'environnement pour travailler sur le raspberry en ssh.
+  - 
