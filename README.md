@@ -46,3 +46,7 @@ MQTT & esp32 :
   > https://www.youtube.com/watch?v=5tG3JXFYrUo
 
 libraire platform io pour MQTT : PubSub `pio lib install 89`
+
+MQTT on raspberry
+  > https://appcodelabs.com/introduction-to-iot-build-an-mqtt-server-using-raspberry-pi
+
