@@ -25,3 +25,5 @@ WiFi.status();
     4: WL_CONNECT_FAILED if the password is incorrect
     6: WL_DISCONNECTED if the module is not configured in station mode
 
+- In `MQTTConfig.h`
+topic = "esp32/output"
