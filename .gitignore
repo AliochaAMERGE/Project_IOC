@@ -54,3 +54,6 @@ dkms.conf
 # VScode
 
 .vscode/
+
+#wifi credentials
+/esp32/include/WifiConfig.h
