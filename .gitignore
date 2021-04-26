@@ -56,4 +56,4 @@ dkms.conf
 .vscode/
 
 #wifi credentials
-/esp32/include/WifiConfig.h
+/esp32/include/WiFiCredentials.h
