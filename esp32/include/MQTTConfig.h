@@ -3,7 +3,7 @@
 #include <WiFi.h>
 
 //  MQTT Broker IP address :
-const char* mqtt_server = "127.0.0.1";
+const char* mqtt_server = "192.168.1.46";
 const int mqtt_port = 1883;  // define in the man
 
 WiFiClient espClient;
