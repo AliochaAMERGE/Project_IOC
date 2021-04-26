@@ -37,18 +37,18 @@ raspberry ssh : 192.168.1.46
 Docs :
 
 MQTT project explanation and examples :
-  > https://cumulocity.com/guides/device-sdk/introduction/
+  https://cumulocity.com/guides/device-sdk/introduction/
 
 Similar project using MQTT : 
-  > https://create.arduino.cc/projecthub/BnBe_Club/mqtt-communication-with-the-nano-33-iot-wemos-d1-boards-5f7f0e?ref=tag&ref_id=mqtt&offset=4
+   https://create.arduino.cc/projecthub/BnBe_Club/mqtt-communication-with-the-nano-33-iot-wemos-d1-boards-5f7f0e?ref=tag&ref_id=mqtt&offset=4
   
 MQTT & esp32 :
-  > https://www.youtube.com/watch?v=5tG3JXFYrUo
+ https://www.youtube.com/watch?v=5tG3JXFYrUo
 
 libraire platform io pour MQTT : PubSub `pio lib install 89`
 
 MQTT on raspberry
-  > https://appcodelabs.com/introduction-to-iot-build-an-mqtt-server-using-raspberry-pi
+   https://appcodelabs.com/introduction-to-iot-build-an-mqtt-server-using-raspberry-pi
 
 https://www.valvers.com/open-software/arduino/esp32-mqtt-tutorial/
 

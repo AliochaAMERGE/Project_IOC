@@ -3,7 +3,6 @@
 
 void connectWifi(void) {
   WiFi.begin(SSID, WiFiPassword);
-  WiFi.setSleep(false);
   Serial.print("Connecting");
   while (WiFi.status() != WL_CONNECTED) {
     Serial.println(WiFi.status());
