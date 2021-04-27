@@ -26,3 +26,8 @@ Hello, world apparait sur le Terminal 1
 
 ---------------------------------------------------------
 
+## Création d'un serveur python
+
+installation de la librairie: 
+`pip3 install paho-mqtt`
+
