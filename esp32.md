@@ -17,6 +17,9 @@ afin d'y renseigner ses parametre wifi:
 ```cpp
 const char *SSID = "SSID";
 const char *WiFiPassword = "passwd";
+//  MQTT Broker IP address :
+const char* mqtt_server = "raspberry ip";
+const int mqtt_port = 1883;  // define in the man
 ```
 WiFi.status();
     0: WL_IDLE_STATUS when Wi-Fi is changing state
