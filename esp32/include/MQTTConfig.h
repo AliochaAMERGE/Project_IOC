@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include <PubSubClient.h>
 #include <WiFi.h>
-#include <WiFiCredentials.h>
+#include <MQTTCredentials.h>
 
 WiFiClient espClient;
 PubSubClient client(espClient);

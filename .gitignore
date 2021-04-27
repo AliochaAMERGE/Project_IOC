@@ -57,3 +57,4 @@ dkms.conf
 
 #wifi credentials
 /esp32/include/WiFiCredentials.h
+/esp32/include/MQTTCredentials.h
