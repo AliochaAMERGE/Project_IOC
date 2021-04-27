@@ -53,3 +53,5 @@ MQTT on raspberry
 https://www.valvers.com/open-software/arduino/esp32-mqtt-tutorial/
 
 https://randomnerdtutorials.com/esp32-mqtt-publish-subscribe-arduino-ide/
+
+http://www.steves-internet-guide.com/mqtt-websockets/

@@ -20,6 +20,7 @@ void connectMQTT(void) {
 }
 
 void callback(char* topic, byte* message, unsigned int length) {
+  
   Serial.print("Message arrived on topic: ");
   Serial.print(topic);
   Serial.print(". Message: ");

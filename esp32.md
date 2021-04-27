@@ -17,6 +17,10 @@ afin d'y renseigner ses parametre wifi:
 ```cpp
 const char *SSID = "SSID";
 const char *WiFiPassword = "passwd";
+```
+
+/esp32/include/MQTTCredentials.h
+```cpp
 //  MQTT Broker IP address :
 const char* mqtt_server = "raspberry ip";
 const int mqtt_port = 1883;  // define in the man
