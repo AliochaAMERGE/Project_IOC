@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
+import paho.mqtt.client as mqtt
+
 mqtt_server = '192.168.1.46'
 mqtt_port = 1883
 mqtt_topic = 'esp32/output'
 mqtt_client_id = 'python_server'
 
-import paho.mqtt.client as mqtt
-
-
+ 
 def on_connect(client, userdata, flags, rc):
     print('connected (%s)' % client._client_id)
     client.subscribe(topic=mqtt_topic, qos=0)
