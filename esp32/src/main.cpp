@@ -4,7 +4,7 @@
 #include "WifiConfig.h"
 
 // use onboard LED for convenience
-#define PHOTORESISTANCE 36
+#define PHOTORESISTANCE_PIN 36
 // maximum received message length
 #define MAX_MSG_LEN (128)
 
@@ -28,7 +28,7 @@ void loop() {
   long now = millis();
   if (now - lastMsg > 5000) {
     lastMsg = now;
-    lumos = analogRead(PHOTORESISTANCE);
+    lumos = analogRead(PHOTORESISTANCE_PIN);
 
     // Convert the value to a char array
     char tempString[8];
