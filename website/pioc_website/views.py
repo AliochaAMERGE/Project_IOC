@@ -1,13 +1,13 @@
 from django.shortcuts import render
 
 
-def index(request : HttpRequest) -> HttpResponse:
+def index(request):
     return render(request, "index.html")
 
 
-def about(request: HttpRequest) -> HttpResponse:
+def about(request):
     return render(request, "about.html")
 
 
-def contact(request: HttpRequest) -> HttpResponse:
+def contact(request):
     return render(request, "contact.html")

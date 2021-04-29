@@ -1,10 +1,13 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}
 Home
 {% endblock %}
 
 {% block content%}
+<img class="mb-4 img-error" src="{%static 'theme/assets/img/error-404-monochrome.svg' %}" />
+
 <h1>
     Template Homepage
 </h1>
