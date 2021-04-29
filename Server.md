@@ -12,4 +12,5 @@ pip install -r requirements/dev.txt
 python manage.py runserver
 
 pour le diagramme quand on aura récupérer les données
+https://startbootstrap.com/template/sb-admin
 https://www.youtube.com/watch?v=rzEXSEkS8gM
