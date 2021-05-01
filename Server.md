@@ -14,3 +14,8 @@ python manage.py runserver
 pour le diagramme quand on aura récupérer les données
 https://startbootstrap.com/template/sb-admin
 https://www.youtube.com/watch?v=rzEXSEkS8gM
+
+
+
+JS part : 
+https://www.freecodecamp.org/news/how-to-make-your-first-javascript-chart/
