@@ -19,3 +19,7 @@ https://www.youtube.com/watch?v=rzEXSEkS8gM
 
 JS part : 
 https://www.freecodecamp.org/news/how-to-make-your-first-javascript-chart/
+
+
+https://www.youtube.com/watch?v=ZsJRXS_vrw0
+https://docs.djangoproject.com/en/3.2/topics/db/queries/
