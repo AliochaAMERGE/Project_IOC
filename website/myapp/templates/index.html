@@ -1,12 +1,14 @@
+{% load static %}
+
 <html>
     <head>
         <title>Peri Web Server</title>
-        <link rel="stylesheet" type="text/html" href="/static/index.css"/>
+        <link rel="stylesheet" type="text/css" href="{% static 'index.css' %}"/>
     </head>
     <body>
         <div class="sommaire">
-            <img class="su" src="/static/Sciences_SU.png" />
-            <img class="peri" src="/static/peri.png" />
+            <img class="su" src="static/Sciences_SU.png" />
+            <img class="peri" src= "static/peri.png" />
             <H1 class="titre">Bienvenue sur notre server MQTT</H1>
             <ul class="liste">
                 <li class="liste_elem">Vous voulez voir la valeur actuelle de notre photoresistance ? <a href="#actualVal">cliquez ici</a></li>
