@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class Data(models.Model):
     # identifiant propre à l'esp (en cas de connection de plusieurs esp)
     id_esp = models.CharField(max_length=200)

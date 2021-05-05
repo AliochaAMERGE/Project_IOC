@@ -14,14 +14,15 @@ import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PROJECT_DIR = os.path.join(BASE_DIR,"pioc_website")
+PROJECT_DIR = os.path.join(BASE_DIR, "pioc_website")
 
+os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '^^@-_kp5od)!kj%#md+89on@j2f1$zyxe0a)l9nvd^j62u#z-j'
+SECRET_KEY = "^^@-_kp5od)!kj%#md+89on@j2f1$zyxe0a)l9nvd^j62u#z-j"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -32,57 +33,55 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    
-    # my apps
-    'myapp.apps.MyappConfig',
-    
     # django apps
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    # my apps
+    "myapp.apps.MyappConfig",
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = 'pioc_website.urls'
+ROOT_URLCONF = "pioc_website.urls"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(PROJECT_DIR, 'templates')],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [os.path.join(PROJECT_DIR, "templates")],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'pioc_website.wsgi.application'
+WSGI_APPLICATION = "pioc_website.wsgi.application"
 
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
     }
 }
 
@@ -92,26 +91,20 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",},
 ]
 
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = "UTC"
 
 USE_I18N = True
 
@@ -123,8 +116,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = "/static/"
 
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR,'static')
-]
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
