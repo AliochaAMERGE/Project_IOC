@@ -29,3 +29,6 @@ https://docs.djangoproject.com/en/3.2/topics/db/queries/
 
 Libraire django mqtt
 https://github.com/ehooo/django_mqtt
+
+
+run with : 192./manage.py runserver --noreload

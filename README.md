@@ -55,3 +55,62 @@ https://www.valvers.com/open-software/arduino/esp32-mqtt-tutorial/
 https://randomnerdtutorials.com/esp32-mqtt-publish-subscribe-arduino-ide/
 
 http://www.steves-internet-guide.com/mqtt-websockets/
+
+
+TODO : 
+
+dans le code serveur, mettre les ip et mdp en parametre, ou dans un fichier à part
+javascript : graphe des données d'il y a un certain temps
+Vérifié que la db ne se rempli pas trop, et au besoin regulé automatiquement
+ajouter un bouton pour allumé eteindre la led (sur un autre topic : esp32/input i.e.)
+nettoyer et commenter nos ajouts (surtout dans le rapport en fait)
+ajouter des jolies couleurs sur la page de garde
+
+commencer le rapport avec les différentes étapes et raisonnement
+
+
+
+
+
+# Page de garde
+
+# table des matieres
+
+
+# introduction et format du projet 
+
+Comment on voulait faire les trucs initialement, et une introduction du sujet
+faire un shéma de quoi est ou (le mqtt et server sur raspberry), esp tier avec tel periph
+
+# ESP32
+
+le code sur l'esp32 et ses limites (deconnection, meme si je crois que ça vient du fait qu'il recoive trop de message, on devrait tenter avec deux topic)
+
+
+# Mise en place du broker
+
+installation, mosquitto, et ou est il
+
+# website
+
+ce que l'on voulait faire, quel outils etc, rapidement
+
+## installation du serveur Django
+
+pourquoi django, et rapide mise en place
+
+## création de la base de donnée
+
+pourquoi tel données, et format
+
+## connection entre la base de donnée et l'esp via le broker
+
+quel méthodes, et ou sont elles appelée
+
+## partie java script et frontend
+
+le joli
+
+# conclusion
+
+# sources
