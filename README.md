@@ -65,6 +65,7 @@ Vérifié que la db ne se rempli pas trop, et au besoin regulé automatiquement
 ajouter un bouton pour allumé eteindre la led (sur un autre topic : esp32/input i.e.)
 nettoyer et commenter nos ajouts (surtout dans le rapport en fait)
 ajouter des jolies couleurs sur la page de garde
+jauge pour la luminosité ?
 
 commencer le rapport avec les différentes étapes et raisonnement
 

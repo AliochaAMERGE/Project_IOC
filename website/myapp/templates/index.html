@@ -1,5 +1,21 @@
 {% load static %}
 
+{% block jquery %}
+var endpoint = '/data'
+$.ajax({
+    method: 'GET',
+    url: endpoint,
+    success: function(data){
+        console.log(data)
+    }
+    error: function(error_data){
+        console.log(error)
+        console.log(data)
+    }
+})
+
+{% endblock %}
+
 <html>
     <head>
         <title>Peri Web Server</title>
@@ -44,6 +60,8 @@
         <div id="graphique" class="graphique">
             <h2 class=section_title>GRAPHIQUE</h2>
             <p class="graphique_txt">Voici notre graphique représentant l'évolution des valeurs communiqué par notre photorésistance</p>
+            <div class="col-sl-12" url_endpot='/data'></div>
+            <div id="chartDiv" style="width:50%; height:300px; margin:0 auto;"></div>
         </div>
 
         <div id="bdd" class="bdd">
@@ -52,6 +70,10 @@
         </div>
 
     </body>
+    
+    <script src="https://code.jscharting.com/2.9.0/jscharting.js"></script>
+    <script src="static/js/index.js"></script>
+
     <footer class="footer">
         <p class="footer_txt">Ce site concerne notre projet d'IOC, nous avons pour but de récuperer 
             la valeur lu sur une photoresistance venant d'un esp32.<br>Celui-ci doit transmettre 

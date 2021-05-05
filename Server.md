@@ -31,4 +31,7 @@ Libraire django mqtt
 https://github.com/ehooo/django_mqtt
 
 
-run with : 192./manage.py runserver --noreload
+run with : ./manage.py runserver --noreload
+
+
+https://www.youtube.com/watch?v=B4Vmm3yZPgc
