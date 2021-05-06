@@ -67,6 +67,8 @@ nettoyer et commenter nos ajouts (surtout dans le rapport en fait)
 ajouter des jolies couleurs sur la page de garde
 jauge pour la luminosité ?
 
+heure d'activité ? (lum > val définie)
+
 commencer le rapport avec les différentes étapes et raisonnement
 
 
