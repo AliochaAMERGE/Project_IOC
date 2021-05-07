@@ -44,6 +44,21 @@
         <div id="graphique" class="graphique">
             <h2 class=section_title>GRAPHIQUE</h2>
             <p class="graphique_txt">Voici notre graphique représentant l'évolution des valeurs communiqué par notre photorésistance</p>
+            
+            <canvas id="myChart" width="400" height="200"></canvas>
+            
+            <script>
+                setInterval(function(){
+                    $.ajax({
+                        url:'/data_updated',
+                        success: function(test){
+                            myChart.data.datasets[0].data = test.value;
+                            myChart.data.labels = test.datasets;
+                            myChart.update();
+                        }
+                    });
+                }, 5000);
+            </script>
         </div>
 
         <div id="bdd" class="bdd">
@@ -55,7 +70,6 @@
     
     <script src="https://code.jscharting.com/2.9.0/jscharting.js"></script>
     <script src="static/js/index.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }} /static/jquery-3.6.0.min.js"></script> 
 
     <footer class="footer">
         <p class="footer_txt">Ce site concerne notre projet d'IOC, nous avons pour but de récuperer 

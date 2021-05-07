@@ -8,7 +8,7 @@ https://appcodelabs.com/introduction-to-iot-build-an-mqtt-server-using-raspberry
 `sudo apt install mosquitto mosquitto-clients`
 
 - 2. Enable the mosquitto broker
-
+    
 Enable the broker and allow it to auto-start after reboot using the following command:
 `sudo systemctl enable mosquitto`
 
@@ -24,10 +24,4 @@ terminal 2:
 
 Hello, world apparait sur le Terminal 1
 
----------------------------------------------------------
-
-## Création d'un serveur python
-
-installation de la librairie: 
-`pip3 install paho-mqtt`
 
