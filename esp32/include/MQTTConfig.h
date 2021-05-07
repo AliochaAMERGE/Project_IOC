@@ -1,7 +1,7 @@
 #include <Arduino.h>
+#include <MQTTCredentials.h>
 #include <PubSubClient.h>
 #include <WiFi.h>
-#include <MQTTCredentials.h>
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -20,11 +20,11 @@ void connectMQTT(void) {
 }
 
 void callback(char* topic, byte* message, unsigned int length) {
-  
   Serial.print("Message arrived on topic: ");
   Serial.print(topic);
   Serial.print(". Message: ");
   String messageTemp;
+  int state;
 
   for (int i = 0; i < length; i++) {
     Serial.print((char)message[i]);
@@ -32,17 +32,16 @@ void callback(char* topic, byte* message, unsigned int length) {
   }
   Serial.println();
 
-  // TODO : Feel free to add more if statements to control more GPIOs with MQTT
-
   // If a message is received on the topic esp32/output, you check if the
   // message is either "on" or "off". Changes the output state according to the
   // message
-  if (String(topic) == "esp32/output") {
+  if (String(topic) == "esp32/input") {
     Serial.print("Changing output to ");
-    if (messageTemp == "on") {
+    state = digitalRead(LED_BUILTIN);
+    if (state == LOW) {
       Serial.println("on");
       digitalWrite(LED_BUILTIN, HIGH);
-    } else if (messageTemp == "off") {
+    } else {
       Serial.println("off");
       digitalWrite(LED_BUILTIN, LOW);
     }
