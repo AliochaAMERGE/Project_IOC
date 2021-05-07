@@ -26,7 +26,8 @@ void loop() {
   }
   client.loop();
   long now = millis();
-  if (now - lastMsg > 5000) {
+  if (now - lastMsg > 1
+  ) {
     lastMsg = now;
     lumos = analogRead(PHOTORESISTANCE_PIN);
 
