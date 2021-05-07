@@ -4,6 +4,8 @@
     <head>
         <title>Peri Web Server</title>
         <link rel="stylesheet" type="text/css" href="{% static 'index.css' %}"/>
+        <script src="../../static/js/jquery-3.6.0.min.js"></script>
+        <script src="../../static/js/led.js"></script>
     </head>
     <body>
         <div class="sommaire">
@@ -31,14 +33,14 @@
             <h2 class=section_title>LED</h2>
             <div class="actualLED_section">
                 <p class="actualLed_txt">Voici la valeur actuelle de la led : </p>
-                <p class="actualLed_val">On</p>
+                <p id="actualLed_val" class="actualLed_val">Off</p>
             </div>
             <div class="actualLED_section">
-                <p class="actualLed_txt">Vous pouvez la modifier en saisissant "on" ou "off" : </p>
-                <form class="actualLed_val" method="POST" action="led.py">
-                    <input class="input_val" name="val"></input>
-                    <input type="submit" value="Entrer">
-                  </form>
+                <p class="actualLed_txt">Vous pouvez changer l'état de la led en cliquant ici : </p>
+                <label class="switch">
+                    <input id="switchLed" type="checkbox">
+                    <span class="slider round"></span>
+                </label>
             </div>
         </div>
 
@@ -122,8 +124,7 @@
 
     </body>
     
-    <script src="https://code.jscharting.com/2.9.0/jscharting.js"></script>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    
 
     <footer class="footer">
         <p class="footer_txt">Ce site concerne notre projet d'IOC, nous avons pour but de récuperer 
