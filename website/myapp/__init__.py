@@ -1,5 +1,5 @@
-# import pioc_website.wsgi.py
-# from . import mqtt_input
+import pioc_website.wsgi.py
+from . import mqtt_input
 
-# mqtt_input.client.loop_start()
+mqtt_input.client.loop_start()
     
