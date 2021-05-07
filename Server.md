@@ -35,3 +35,5 @@ run with : ./manage.py runserver --noreload
 
 
 https://www.youtube.com/watch?v=B4Vmm3yZPgc
+
+https://canvasjs.com/docs/charts/how-to/creating-dynamic-charts/

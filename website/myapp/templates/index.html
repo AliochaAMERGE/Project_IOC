@@ -45,20 +45,69 @@
             <h2 class=section_title>GRAPHIQUE</h2>
             <p class="graphique_txt">Voici notre graphique représentant l'évolution des valeurs communiqué par notre photorésistance</p>
             
-            <canvas id="myChart" width="400" height="200"></canvas>
+            <script type="text/javascript">
+                window.onload = function () {   
             
-            <script>
-                setInterval(function(){
-                    $.ajax({
-                        url:'/data_updated',
-                        success: function(test){
-                            myChart.data.datasets[0].data = test.value;
-                            myChart.data.labels = test.datasets;
-                            myChart.update();
-                        }
-                    });
-                }, 5000);
+                  var dps = [{x: 1, y: 10}, 
+                  {x: 2, y: 13}, {x: 3, y: 18}, 
+                  {x: 4, y: 20}, {x: 5, y: 17}, 
+                  {x: 6, y: 10}, {x: 7, y: 13}, 
+                  {x: 8, y: 18}, {x: 9, y: 20}, 
+                  {x: 10, y: 17}];   //dataPoints. 
+            
+                  var chart = new CanvasJS.Chart("chartContainer",{
+                      title :{
+                          text: "Live Data"
+                      },
+                      axisX: {						
+                          title: "Axis X Title"
+                      },
+                      axisY: {						
+                          title: "Units"
+                      },
+                      data: [{
+                          type: "line",
+                          dataPoints : dps
+                      }]
+                  });
+            
+                  chart.render();
+                  var xVal = dps.length + 1;
+                  var yVal = 15;	
+                  var updateInterval = 1000;
+            
+                  var updateChart = function () {
+
+                    $.getJSON('/data', function(data) {
+
+                        console.log(data[0].value);
+                        dps.push({x: xVal, y: data[0].value});
+                    }); 
+                    
+
+                    //   yVal = yVal +  Math.round(5 + Math.random() *(-5-5));
+                    //   dps.push({x: xVal,y: yVal});
+                      
+                      xVal++;
+                      if (dps.length >  10 )
+                      {
+                          dps.shift();				
+                      }
+            
+                      chart.render();		
+            
+                // update chart after specified time. 
+            
+            };
+            
+            setInterval(function(){updateChart()}, updateInterval); 
+            }
             </script>
+            <script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+            </head>
+            <body>
+                <div id="chartContainer" style="height: 300px; width: 100%;">
+                </div>
         </div>
 
         <div id="bdd" class="bdd">
@@ -69,7 +118,7 @@
     </body>
     
     <script src="https://code.jscharting.com/2.9.0/jscharting.js"></script>
-    <script src="static/js/index.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 
     <footer class="footer">
         <p class="footer_txt">Ce site concerne notre projet d'IOC, nous avons pour but de récuperer 

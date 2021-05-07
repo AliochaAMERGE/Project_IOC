@@ -15,7 +15,6 @@ def index(request):
 
 def get_data(request):
     data = list(Data.objects.order_by("-pub_date").values()[:50]) # change with date
-    print(data)
     return JsonResponse(data, safe=False)
 
 def auto_update(request):
