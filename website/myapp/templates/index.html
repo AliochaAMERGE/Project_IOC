@@ -22,7 +22,8 @@
             <h2 class=section_title>PHOTORESISTANCE</h2>
             <div class="actualVal_content">
                 <p class="actualVal_txt">Voici la valeur actuelle de notre photoresistance : </p>
-                <p class="actualVal_val">{{value}}</p>
+                <p id="current_value" class="actualVal_val">{{value}}</p>
+            
             </div>
         </div>
         
@@ -46,6 +47,7 @@
             <p class="graphique_txt">Voici notre graphique représentant l'évolution des valeurs communiqué par notre photorésistance</p>
             
             <script type="text/javascript">
+                var element = document.getElementById("current_value")
                 window.onload = function () {   
             
                   var dps = [{x: 1, y: 10}, 
@@ -56,6 +58,7 @@
                   {x: 10, y: 17}];   //dataPoints. 
             
                   var chart = new CanvasJS.Chart("chartContainer",{
+                      theme: "light1",
                       title :{
                           text: "Live Data"
                       },
@@ -67,7 +70,8 @@
                       },
                       data: [{
                           type: "line",
-                          dataPoints : dps
+                          dataPoints : dps,
+                          color :"purple"
                       }]
                   });
             
@@ -80,8 +84,9 @@
 
                     $.getJSON('/data', function(data) {
 
-                        console.log(data[0].value);
                         dps.push({x: xVal, y: data[0].value});
+                        element.innerHTML = data[0].value;
+
                     }); 
                     
 
