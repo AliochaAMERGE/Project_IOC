@@ -116,4 +116,21 @@ le joli
 
 # conclusion
 
+# pour aller plus loin 
+
+TODO : expliquer plus en détails comment le faire dans la mesure du possible
+
+Ajouter un menu pour ajouter plusieurs esp32, et faire une table par esp32, ou un identifiant et les mettres dans la meme table et gérer plus efficacement les adresses ip des serveurs et ou broker.
+
+Gérer des requetes pour récupérer la moyenne des xx dernieres données, ou des données au cours des xx derniere heure (sql)
+
+faire en sorte que les données du graphique restent inchangées lorsqu'il n'y a pas de nouvelles valers dans la BD
+
+utiliser le BP pour activer desactiver le transfert des données sur le broker
+
+gérer d'autre capteurs que les photorésistance
+
+
+
+
 # sources
