@@ -4,8 +4,9 @@
     <head>
         <title>Peri Web Server</title>
         <link rel="stylesheet" type="text/css" href="{% static 'index.css' %}"/>
-        <script src="../../static/js/jquery-3.6.0.min.js"></script>
-        <script src="../../static/js/led.js"></script>
+        <script src="static/js/jquery-3.6.0.min.js"></script>
+        <script src="static/js/paho-mqtt.js"></script>
+        <script src="static/js/led.js"></script>
     </head>
     <body>
         <div class="sommaire">
@@ -65,10 +66,10 @@
                           text: "Live Data"
                       },
                       axisX: {						
-                          title: "Axis X Title"
+                          title: ""
                       },
                       axisY: {						
-                          title: "Units"
+                          title: ""
                       },
                       data: [{
                           type: "line",
@@ -90,11 +91,7 @@
                         element.innerHTML = data[0].value;
 
                     }); 
-                    
-
-                    //   yVal = yVal +  Math.round(5 + Math.random() *(-5-5));
-                    //   dps.push({x: xVal,y: yVal});
-                      
+                       
                       xVal++;
                       if (dps.length >  10 )
                       {
@@ -115,11 +112,6 @@
             <body>
                 <div id="chartContainer" style="height: 300px; width: 100%;">
                 </div>
-        </div>
-
-        <div id="bdd" class="bdd">
-            <h2 class="section_title">BASE DE DONNEE</h2>
-            <p class="bdd_txt">Voici un apercu de notre base de donnée</p>
         </div>
 
     </body>

@@ -3,7 +3,7 @@
     src: url('fonts/Agilia.ttf');
 }   
 
-.sommaire, .actualVal, .actualLed, .graphique, .bdd{
+.sommaire, .actualVal, .actualLed, .graphique{
     padding: 40px;
     border-bottom: 1px solid black;
 }
@@ -36,11 +36,6 @@
 a{
     color: black;
 }
-.section_title{
-    margin-bottom: 40px;
-    text-align: center;
-    text-decoration: underline;
-}
 .actualVal, .actualLed{
     float: left;
     padding: 40px 0 40px 0;
@@ -58,7 +53,7 @@ a{
     float: left;
 }
 .actualLed_section{
-    display: inline-block;
+    display: flow-root;
 }
 .actualLed_txt{
     float: left;
@@ -135,10 +130,10 @@ a{
     border-radius: 50%;
   }
 
-.graphique,.bdd{
+.graphique{
     display: flow-root;
 }
-.graphique_txt, .bdd_txt{
+.graphique_txt{
     text-align: center;
 }
 .footer{

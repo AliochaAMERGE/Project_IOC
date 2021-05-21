@@ -85,18 +85,17 @@ commencer le rapport avec les différentes étapes et raisonnement
 Comment on voulait faire les trucs initialement, et une introduction du sujet
 faire un shéma de quoi est ou (le mqtt et server sur raspberry), esp tier avec tel periph
 
-# ESP32
-
-le code sur l'esp32 et ses limites (deconnection, meme si je crois que ça vient du fait qu'il recoive trop de message, on devrait tenter avec deux topic)
-
-
 # Mise en place du broker
 
-installation, mosquitto, et ou est il
+installation, mosquitto, et ou est il, les commandes bash pour test et schéma de comment ça marche
+
+# ESP32
+
+le code sur l'esp32 et ses limites (deconnection, meme si je crois que ça vient du fait qu'il recoit trop de message, on devrait tenter avec deux topic) c'est tenter avec deux topics et c'est toujours cassé
 
 # website
 
-ce que l'on voulait faire, quel outils etc, rapidement
+ce que l'on voulait faire, quel outils etc, rapidement, c'est l'intro de la partie
 
 ## installation du serveur Django
 
@@ -109,6 +108,11 @@ pourquoi tel données, et format
 ## connection entre la base de donnée et l'esp via le broker
 
 quel méthodes, et ou sont elles appelée
+pourquoi avons nous ajouter les données direct dans la bdd, et pas au niveau des messages
+
+NB : on a du mqtt c++ python et js
+
+ATTENTION, erreur si reception d'un message non composé de nombre
 
 ## partie java script et frontend
 
@@ -116,7 +120,11 @@ le joli
 
 # conclusion
 
+les connaissances que nous avons acquise
+
 # pour aller plus loin 
+
+Ce que nous aurions pu faire si plus de temps / de matos, et comment l'aurons nous fait rapidement
 
 TODO : expliquer plus en détails comment le faire dans la mesure du possible
 
@@ -130,6 +138,7 @@ utiliser le BP pour activer desactiver le transfert des données sur le broker
 
 gérer d'autre capteurs que les photorésistance
 
+utiliser le bluetooth plutot que le wifi, pour plus de portabilité
 
 
 
