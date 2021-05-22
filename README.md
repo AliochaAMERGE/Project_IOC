@@ -140,6 +140,6 @@ gérer d'autre capteurs que les photorésistance
 
 utiliser le bluetooth plutot que le wifi, pour plus de portabilité
 
-
+dans la chart, utiliser les dates plutot que rien actuellement
 
 # sources
