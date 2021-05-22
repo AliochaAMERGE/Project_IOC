@@ -1,93 +1,112 @@
-# Project_IOC
-Projet d'IOC M1 SAR 2021
+# IOC [MU4IN109] - Micro projet
 
-Objectif : 
+Réalisé par :
 
-Controler un esp32 depuis un navigateur sur pc, en passant par un serveur sur raspberry3.
+- **Haitham OUERSIGHNI M1 SAR**
+- **Aliocha AMERGÉ M1 SAR**
 
-TODO :
+Lien du projet : https://github.com/AliochaAMERGE/Project_IOC
 
-projet MQTT
+Ce projet a été réalisé dans le cadre de l'UE IOC (MU4IN109) du master 1 Informatique mention SAR de *Sorbonne Université*.
 
-raspberry ssh : 192.168.1.46
+<div style="page-break-after: always;"></div>
 
-- Sur le raspberry
+# Table of contents
 
-  - creer un serveur local sur le raspberry en python
-    - lecture d'un capteur et affichage de sa valeurs
-    - écriture sur un capteur
-    - creer un site vitrine sur ce serveur 
-      - nous y afficherons au début les valeurs des capteurs apres une requete.
-    - creer une base de donnée sqlite simple contenant une unique table, pour l'historique des capteurs (date, capteur, valeur)
-    - javascript : actualisation constante des valeurs d'un capteur
-    - ouvrir le serveur pour un acces non local
-  
-- Sur l'ESP32
-
-  - brancher Led et ou photorésistance, et ou bouton (tout ce qu'on a en fait)
-  - connecter au wifi : https://techtutorialsx.com/2017/04/24/esp32-connecting-to-a-wifi-network/
-  - connecter au raspberry en reseau local via le wifi
-
-- Sur le pc
-
-  - configurer l'environnement pour travailler sur le raspberry en ssh.
-  - rien d'autre pour le moment, on ouvrira juste l'url du serveur (local dans un premier temps)
+- [IOC [MU4IN109] - Micro projet](#ioc--mu4in109----micro-projet)
+- [Table of contents](#table-of-contents)
+- [Introduction et format du projet](#introduction-et-format-du-projet)
+  * [Les consignes :](#les-consignes--)
+  * [Nos objectifs :](#nos-objectifs--)
+  * [Matériel utilisé :](#mat-riel-utilis---)
+- [Mise en place du broker](#mise-en-place-du-broker)
+- [ESP32](#esp32)
+- [website](#website)
+  * [installation du serveur Django](#installation-du-serveur-django)
+  * [création de la base de donnée](#cr-ation-de-la-base-de-donn-e)
+  * [connection entre la base de donnée et l'esp via le broker](#connection-entre-la-base-de-donn-e-et-l-esp-via-le-broker)
+  * [partie java script et frontend](#partie-java-script-et-frontend)
+- [conclusion](#conclusion)
+- [pour aller plus loin](#pour-aller-plus-loin)
+- [sources](#sources)
 
 
-Docs :
+# Introduction et format du projet 
 
-MQTT project explanation and examples :
-  https://cumulocity.com/guides/device-sdk/introduction/
+## Les consignes :
 
-Similar project using MQTT : 
-   https://create.arduino.cc/projecthub/BnBe_Club/mqtt-communication-with-the-nano-33-iot-wemos-d1-boards-5f7f0e?ref=tag&ref_id=mqtt&offset=4
-  
-MQTT & esp32 :
- https://www.youtube.com/watch?v=5tG3JXFYrUo
+&emsp;Le micro-projet consiste à mettre en place un serveur HTTP sur une rasperrypi. 
+Ce serveur devra afficher des données envoyées par l'ESP32, et permettre d'envoyer des messages à afficher sur l'écran OLED de l'ESP32.
+Les données envoyées seront les valeurs de la photorésistance.
 
-libraire platform io pour MQTT : PubSub `pio lib install 89`
+## Nos objectifs :
 
-MQTT on raspberry
-   https://appcodelabs.com/introduction-to-iot-build-an-mqtt-server-using-raspberry-pi
-
-https://www.valvers.com/open-software/arduino/esp32-mqtt-tutorial/
-
-https://randomnerdtutorials.com/esp32-mqtt-publish-subscribe-arduino-ide/
-
-http://www.steves-internet-guide.com/mqtt-websockets/
-
-
-TODO : 
-
-dans le code serveur, mettre les ip et mdp en parametre, ou dans un fichier à part
-javascript : graphe des données d'il y a un certain temps
-Vérifié que la db ne se rempli pas trop, et au besoin regulé automatiquement
-ajouter un bouton pour allumé eteindre la led (sur un autre topic : esp32/input i.e.)
-nettoyer et commenter nos ajouts (surtout dans le rapport en fait)
-ajouter des jolies couleurs sur la page de garde
-jauge pour la luminosité ?
-
-heure d'activité ? (lum > val définie)
-
-commencer le rapport avec les différentes étapes et raisonnement
+&emsp;Au cours de ce micro-projet, nous voulons faire communiquer un ESP32 avec un raspberrypi, et ce au travers d'un broker MQTT.
+L'objectif est donc de récupérer les valeurs de la photorésistance de l'ESP32, les envoyées au broker MQTT implémenter sur le raspberrypi,
+qui à son tour, transfère les données sur le site web implémenter également sur le raspberrypi.
 
 
 
+## Matériel utilisé :
 
+&emsp;Au cours de ce micro-projet, nous utiliserons :
+- Un [ESP32 + LoRa](https://randomnerdtutorials.com/ttgo-lora32-sx1276-arduino-ide/) avec un écran OLED intégré (modèle TTGO LoRa32 SX1276 OLED). 
 
-# Page de garde
+- Un [raspberry pi 3 modèle B](https://www.raspberrypi.org/products/raspberry-pi-3-model-b/) avec [Raspberry Pi OS](https://www.raspberrypi.org/software/operating-systems/#raspberry-pi-os-32-bit) (anciennement Raspbian) installé.
 
-# table des matieres
+- Un serveur utilisant le framework python [Django](https://www.djangoproject.com/)
 
+- Un broker MQTT [Mosquitto](https://mosquitto.org/)
 
-# introduction et format du projet 
-
-Comment on voulait faire les trucs initialement, et une introduction du sujet
-faire un shéma de quoi est ou (le mqtt et server sur raspberry), esp tier avec tel periph
+Nous vous remercions pour nous avoir mis tout ce matériel à disposition.
 
 # Mise en place du broker
 
-installation, mosquitto, et ou est il, les commandes bash pour test et schéma de comment ça marche
+## Qu'est ce qu'un broker MQTT ?
+
+&emsp;MQTT (message Queuing Telemetry Transport) est un protocole de messagerie qui fonctionne sur le principe de souscription / publication. [[1]](https://projetsdiy.fr/mosquitto-broker-mqtt-raspberry-pi/)
+Concrêtement, le broker MQTT fait office d'intérmédiaire entre différents clients. Lorsque qu'un client s'**abonne** (subscribe) sur un **topic**, le broker lui transmettra tous les messages **publié** (publish) par d'autre client sur ce **même topic**. Les topics sont liés au broker, il n'y aura pas de conflit si nous utilisons deux fois le même topic sur deux brokers différents, ces deux topics seront distincts.
+
+![MQTT-example](/img/MQTT.png)
+*Fonctionnement d'un broker* : nous avons deux clients (4 et 5) abonnés sur deux topic */data/A* et */data/B* et trois clients (1, 2 et 3) publiant des messages sur les topics */data/A* et */data/b*. 
+Le broker transférerant tous les messages du client 1 et 3 aux client 4 et 5, et tous les messages des clients 2 et 3 au client 4.
+
+Dans ce micro-projet, le schéma sera le suivant : 
+
+![](/img/ourMQTT.png)
+
+Le raspberry héberge le broker MQTT et le site web. L'ESP32 produit les données via sa photorésistance.
+Les données de la photorésistance sont envoyé au broker via le topic esp32/output (valeurs entre 0 et 4000).
+L'utilisateur à la possibilité d'allumer ou éteindre la LED depuis le site web, les messages seront envoyé sur le topic /esp32/input et contiendront les valeurs "on" ou "off".
+
+## Installation du broker MQTT sur la raspberry
+
+&emsp;Nous utilisons un broker MQTT [Mosquitto](https://mosquitto.org/) intégré au raspberrypi.
+
+Source pour reproduire l'installation : 
+https://appcodelabs.com/introduction-to-iot-build-an-mqtt-server-using-raspberry-pi
+
+- 1. Install the mosquitto MQTT Broker 
+
+`sudo apt install mosquitto mosquitto-clients`
+
+- 2. Enable the mosquitto broker
+    
+Enable the broker and allow it to auto-start after reboot using the following command:
+`sudo systemctl enable mosquitto`
+
+- 3. Subscribe to the MQTT Topic Locally
+
+In the existing terminal, subscribe to the `test/message` topic:
+
+terminal 1: 
+`mosquitto_sub -h localhost -t "test/message"`
+
+terminal 2: 
+`mosquitto_pub -h localhost -t "test/message" -m "Hello, world"`
+
+Hello, world apparait sur le Terminal 1
+
 
 # ESP32
 

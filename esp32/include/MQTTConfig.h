@@ -57,7 +57,7 @@ void reconnect() {
     if (client.connect("ESP8266Client")) {
       Serial.println("connected");
       // Subscribe
-      // client.subscribe("esp32/output");
+      client.subscribe("esp32/input");
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
