@@ -447,6 +447,40 @@ Nous avons l'arborescence de notre site :
 Des étapes sont nécessaire pour ajouter nos applications nouvellement crée au serveur Django, elles sont très bien expliquée sur le [vidéo suivante](https://www.youtube.com/watch?v=PqeAvFf_HDI) : 
 <iframe width="280" height="158" src="https://www.youtube.com/embed/PqeAvFf_HDI" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
+Arborescence détaillée du serveur Django
+```
+.
+├── db.sqlite3  ~ la base de donnée expliqué plus tard dans le rapport
+├── manage.py   ~ gestion du serveur, ex : "./manage.py runserver" pour démarrer le serveur
+├── myapp       ~ application énoncée ci-dessus, les opérations sont réalisé ici
+│   ├── admin.py  ~ gestion administrateur de l'app, auto générér non modifié
+│   ├── apps.py   ~ paramètre de l'app, auto générér non modifié
+│   ├── __init__.py  ~ programme python exécuter au démarrage du serveur, explicité plus tard dans le rapport
+│   ├── migrations   ~ dossier auto générer gérant les migrations
+│   │   └── [...]  
+│   ├── models.py    ~ création des tables pour la base de donnée
+│   ├── mqtt_input.py  ~ programme appelé dans __init__ 
+│   ├── __pycache__  ~ cache
+│   │   └── [...]
+│   ├── templates
+│   │   └── index.html
+│   ├── tests.py  ~ Programme pour test, non utilisé
+│   ├── urls.py   ~ Gestion des routes du serveur (en partant de la route de myapp)
+│   └── views.py  ~ Gestion des rendus du serveur associé aux routes
+├── pioc_website   ~ Le serveur Django ~
+│   ├── asgi.py  
+│   ├── __init__.py  ~ même chose que myapp, non exploit
+│   ├── __pycache__
+  ~ cache│   │   └── w[...] │   ├── settings.py
+   ~ paramètre du serveur, nous indiquerons les app et les paths utile au serveur│   ├── urls.py
+   ~ route du serveur, nous définirons myapp comme la route principale│   └── wsgi.py
+  ├── requirements
+   ~ dépendances du serveur│   ├── dev.txt
+│   └── prod.txt
+└── static
+     ~ Dossier contenant les élements statics pour les rendus (images, CSS, javascripts)
+    └── [...]
+```
 
 installation de django et paho : explication du requierements
 
