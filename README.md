@@ -386,7 +386,7 @@ Ces commandes sont  { "LedOn" : allume la Led, "LedOff" : éteint la Led, "autre
 
 # Website
 
-Nous attaquons la partie le plus conséquente de ce micro-projet, et celle qui nous a demandé le plus de temps, et le plus de lecture de documentation.
+Nous attaquons la partie le plus conséquente de ce micro-projet, et celle qui nous a demandé le plus de temps, et le plus de lecture de documentation. Nous n'expliciterons pas toutes les étapes de notre cheminemant afin de créer le site car la rapport serait bien trop long. Nous indiquerons donc dans la mesure du possible la doc / les tutoriels afin de reproduire les étapes, et nous prendrons au maximum appuie sur le code.
 
 ## Objectifs
 
@@ -414,9 +414,7 @@ Au début de ce projet, nous pensions que le site web serait un *support* et que
 
 ### Création du serveur Django
 
-La création du serveur Django se base grandement sur cette playlist youtube par [HackerShack](http://www.thehackershack.com/) : 
-
-<iframe width="280" height="158" src="https://www.youtube.com/embed/videoseries?list=PL39pssg07dpDJas1vxb7Dyw5f8SkAw6c-" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+La création du serveur Django se base grandement sur cette playlist youtube par [HackerShack](http://www.thehackershack.com/) : https://www.youtube.com/embed/videoseries?list=PL39pssg07dpDJas1vxb7Dyw5f8SkAw6c-
 
 - Mise en place d'un environnement virtuel python :
 
@@ -447,7 +445,6 @@ Nous avons l'arborescence de notre site :
     └── prod.txt
 ```
 Des étapes sont nécessaire pour ajouter nos applications nouvellement crée au serveur Django, elles sont très bien expliquée sur le [vidéo suivante](https://www.youtube.com/watch?v=PqeAvFf_HDI) : 
-<iframe width="280" height="158" src="https://www.youtube.com/embed/PqeAvFf_HDI" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 - Arborescence détaillée du serveur Django :
 ```
@@ -485,17 +482,21 @@ Des étapes sont nécessaire pour ajouter nos applications nouvellement crée au
     └── [...]
 ```
 
+Pour lancer le serveur, nous utiliserons : `./manage.py runserver` 
+
 Tout d'abord, nous ajoutons une route vers *myapp*, ce sera la route par défaut :
 
 Dans le fichier [pioc_website/urls.py](/website/pioc_website/urls.py), nous ajouterons `path("", include("myapp.urls"))` dans la liste des *urlpatterns*.
 
-Dans le fichier /puic
+Dans myapp, nous ajoutons la *view* index à la route par défaut.
+Dans le fichier [myapp/urls.py](/website/myapp/urls.py), nous ajouterons `path("", views.index, name="index")` dans la liste des *urlpatterns*.
 
-installation de django et paho : explication du requierements
+Dans le fichier [myapp/views.py](website/myapp/views.py), nous ajoutons une méthode afin de générer le rendu, nous appelerons un fichier `index.html` que nous ajouterons dans le dossier `myapp/template/`.
+Le contenu de ce fichier sera explicité plus tard.
 
-démarrage du serveur et creation de l'app
+Si nous lançons le serveur, à l'adresse `localhost:8000`, le contenu de `index.html` devrait s'afficher.
 
-creation des routes
+La base de notre serveur est en place.
 
 ## création de la base de donnée
 
