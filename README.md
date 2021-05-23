@@ -412,28 +412,73 @@ Au début de ce projet, nous pensions que le site web serait un *support* et que
 
 ### Création du serveur Django
 
+création d'un env virtuel python, pourquoi ?
 
+installation de django et paho : explication du requierements
+
+démarrage du serveur et creation de l'app
+
+creation des routes
 
 ## création de la base de donnée
 
-pourquoi tel données, et format
+pourquoi la bd
+format d'une table
+a quel moment on creer la table
+ou la bdd est utilisées (ajout et utilisation des données)
+limite (les données n'expire pas)
+
 
 ## connection entre la base de donnée et l'esp via le broker
 
-quel méthodes, et ou sont elles appelée
-pourquoi avons nous ajouter les données direct dans la bdd, et pas au niveau des messages
+quel méthodes, et ou sont elles appelée -> pourquoi dans init
+
+pourquoi avons nous ajouter les données direct dans la bdd, et pas au niveau des messages --> fait dans bdd
 
 NB : on a du mqtt c++ python et js
 
+limite : 
 ATTENTION, erreur si reception d'un message non composé de nombre
+partie js non fonctionnelle car connection refusée, expliquer pourquoi (connection anonyme, acces depuis client et non serveur)
 
 ## partie java script et frontend
 
-le joli
+views python
+html
+css
+js et graphe
+
+limite du graphe
 
 # conclusion
 
+resumé de ce que nos avons fait tres rapidement
+
 les connaissances que nous avons acquise
+  MQTT broker
+  python
+    class init
+  django
+    gestion d'un serveur des urls et des vue
+  html et css
+  js
+  utilsation d'un esp et d'un raspberry
+  connection sur un raspberry
+  clé ssh et gestionnaire dans le .ssh
+  platformIO plus en détail
+  mermaid pour le rapport
+
+  travail sur un projet tres concret et d'actualité
+    des connaissances utiles en tout cas
+    confirmation et application des acquis precedents
+  
+  un projet tres ouvert à notre imagination, beaucoup de chose a faire, et nous n'avons pas pu tout faire cf : aller plus loin
+
+  un  projet utilisant beaucoup de langage d'API et beaucoup docummenté sur le web -> demande beaucoup de recherche et de tri d'information
+
+  en bref un super projet trop interessant, on a vu trop de truc, envie de faire plein de chose, merci monsieur pour tout c'est trop cool
+
+  
 
 # pour aller plus loin 
 
@@ -443,16 +488,22 @@ TODO : expliquer plus en détails comment le faire dans la mesure du possible
 
 Ajouter un menu pour ajouter plusieurs esp32, et faire une table par esp32, ou un identifiant et les mettres dans la meme table et gérer plus efficacement les adresses ip des serveurs et ou broker.
 
+
 Gérer des requetes pour récupérer la moyenne des xx dernieres données, ou des données au cours des xx derniere heure (sql)
 
 faire en sorte que les données du graphique restent inchangées lorsqu'il n'y a pas de nouvelles valers dans la BD
+(regarder la date ou id de la derniere valeurs)
 
 utiliser le BP pour activer desactiver le transfert des données sur le broker
+creation d'un flag qui passe a vrai si bouton pressé
 
 gérer d'autre capteurs que les photorésistance
+tu vois l'idée, faire plus de table en fonction, ou plus d'attribut pour faire des envoies groupé
 
 utiliser le bluetooth plutot que le wifi, pour plus de portabilité
+(esp32 sur batterie portable, connection via bluetooth donc pas de MQTT, plus limité mais plus portable)
 
 dans la chart, utiliser les dates plutot que rien actuellement
+a groupé avec la requete sql et avoir des moyennes sur la journée, ou un historique exploitable (les dates sont implémentée mais pas utilisée)
 
 # Remerciement
