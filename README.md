@@ -429,6 +429,8 @@ Nous créons un environnement que nous appelerons `DjangoWebsite@3.7.3` sous pyt
 
 Nous ajouterons également un dossier `/requierements/` contenant deux fichiers : `dev.txt` et `prod.txt` afin de gérer les dépendances du serveur à l'aide de la commande `pip install -r dev.txt`.
 
+- Mise en place du serveur Django
+
 Nous installerons ensuite la librairie Django avec `pip install Django`. Dependance que nous ajouterons à `prod.txt`.
 
 Nous créons ensuite un projet Django avec la commande `django-admin startproject pioc_website` ce sera notre site web. Au sein de ce site, nous créons une application que sera propre à ce projet, nous l'avons appeler *myapp* (le non aurai pu être mieux choisis) `./manage.py startapp myapp`. 
@@ -447,7 +449,7 @@ Nous avons l'arborescence de notre site :
 Des étapes sont nécessaire pour ajouter nos applications nouvellement crée au serveur Django, elles sont très bien expliquée sur le [vidéo suivante](https://www.youtube.com/watch?v=PqeAvFf_HDI) : 
 <iframe width="280" height="158" src="https://www.youtube.com/embed/PqeAvFf_HDI" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
-Arborescence détaillée du serveur Django
+- Arborescence détaillée du serveur Django :
 ```
 .
 ├── db.sqlite3  ~ la base de donnée expliqué plus tard dans le rapport
@@ -472,7 +474,7 @@ Arborescence détaillée du serveur Django
 │   ├── asgi.py  
 │   ├── __init__.py  ~ même chose que myapp, non exploit
 │   ├── __pycache__  ~ cache
-│   │   └── w[...] 
+│   │   └── [...] 
 │   ├── settings.py   ~ paramètre du serveur, nous indiquerons les app et les paths utile au serveur
 │   ├── urls.py   ~ route du serveur, nous définirons myapp comme la route principale
 │   └── wsgi.py
@@ -482,6 +484,12 @@ Arborescence détaillée du serveur Django
 └── static     ~ Dossier contenant les élements statics pour les rendus (images, CSS, javascripts)
     └── [...]
 ```
+
+Tout d'abord, nous ajoutons une route vers *myapp*, ce sera la route par défaut :
+
+Dans le fichier [pioc_website/urls.py](/website/pioc_website/urls.py), nous ajouterons `path("", include("myapp.urls"))` dans la liste des *urlpatterns*.
+
+Dans le fichier /puic
 
 installation de django et paho : explication du requierements
 
