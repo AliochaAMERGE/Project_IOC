@@ -30,6 +30,8 @@ Ce projet a été réalisé dans le cadre de l'UE IOC (MU4IN109) du master 1 Inf
 - [pour aller plus loin](#pour-aller-plus-loin)
 - [sources](#sources)
 
+# TODO CONSIGNE POUR EXECUTER LE CODE ET LECTURE DU README
+
 
 # Introduction et format du projet 
 
@@ -412,7 +414,39 @@ Au début de ce projet, nous pensions que le site web serait un *support* et que
 
 ### Création du serveur Django
 
-création d'un env virtuel python, pourquoi ?
+La création du serveur Django se base grandement sur cette playlist youtube par [HackerShack](http://www.thehackershack.com/) : 
+
+<iframe width="280" height="158" src="https://www.youtube.com/embed/videoseries?list=PL39pssg07dpDJas1vxb7Dyw5f8SkAw6c-" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+- Mise en place d'un environnement virtuel python :
+
+*Pourquoi* ? Afin de faciliter les dépendances, les librairies, leurs versions, et la vesion de python.
+Python 2 et python 3 n'étant pas retro-compatible, il est parfois nécessaire de forcer un environnement pour éviter tout problème de compatibilité.
+
+Pour créer un environnement virtuel, nous utiliserons [*pyenv*](https://github.com/pyenv/pyenv) ([lien pour l'installation sous Ubuntu](https://www.liquidweb.com/kb/how-to-install-pyenv-on-ubuntu-18-04/)) suivi de [*pyenv virtualenv*](https://github.com/pyenv/pyenv-virtualenv) ([lien pour l'installation sous Ubuntu](https://www.liquidweb.com/kb/how-to-install-pyenv-virtualenv-on-ubuntu-18-04/)).
+
+Nous créons un environnement que nous appelerons `DjangoWebsite@3.7.3` sous python 3.7.3.
+
+Nous ajouterons également un dossier `/requierements/` contenant deux fichiers : `dev.txt` et `prod.txt` afin de gérer les dépendances du serveur à l'aide de la commande `pip install -r dev.txt`.
+
+Nous installerons ensuite la librairie Django avec `pip install Django`. Dependance que nous ajouterons à `prod.txt`.
+
+Nous créons ensuite un projet Django avec la commande `django-admin startproject pioc_website` ce sera notre site web. Au sein de ce site, nous créons une application que sera propre à ce projet, nous l'avons appeler *myapp* (le non aurai pu être mieux choisis) `./manage.py startapp myapp`. 
+Nous migrons ensuite l'application que nous venons de créer : `./manage.py migrate`. Les migrations sont la manière par laquelle Django propage des modifications que nous apportons à des modèles (ajout d’un champ, suppression d’un modèle, etc.) dans un schéma de base de données.[[*](https://docs.djangoproject.com/fr/3.2/topics/migrations/)]
+
+Nous avons l'arborescence de notre site :
+```
+.
+├── manage.py
+├── myapp
+├── pioc_website
+└── requirements
+    ├── dev.txt
+    └── prod.txt
+```
+Des étapes sont nécessaire pour ajouter nos applications nouvellement crée au serveur Django, elles sont très bien expliquée sur le [vidéo suivante](https://www.youtube.com/watch?v=PqeAvFf_HDI) : 
+<iframe width="280" height="158" src="https://www.youtube.com/embed/PqeAvFf_HDI" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
 
 installation de django et paho : explication du requierements
 
