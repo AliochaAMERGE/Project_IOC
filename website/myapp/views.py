@@ -8,10 +8,13 @@ from .models import Data
 
 
 def index(request):
+
+    # if request.method == 'POST' and 'run_script' in request.POST:
+    #     publish.single("esp32/input/single", "switch", hostname="192.168.1.46")
+        
     template = loader.get_template("index.html")
     data = Data.objects.order_by("-pub_date").all()[0]
     return render(request, "index.html", {f"value": data.value})
-
 
 def get_data(request):
     data = list(Data.objects.order_by("-pub_date").values()[:50]) # change with date

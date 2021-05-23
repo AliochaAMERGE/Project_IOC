@@ -58,8 +58,6 @@ qui à son tour, transfère les données sur le site web implémenter également
 
 - Un broker MQTT [Mosquitto](https://mosquitto.org/)
 
-Nous vous remercions pour nous avoir mis tout ce matériel à disposition.
-
 # Mise en place du broker
 
 ## Qu'est ce qu'un broker MQTT ?
@@ -110,6 +108,7 @@ Hello, world apparait sur le Terminal 1
 
 # ESP32
 
+Dans cette section
 le code sur l'esp32 et ses limites (deconnection, meme si je crois que ça vient du fait qu'il recoit trop de message, on devrait tenter avec deux topic) c'est tenter avec deux topics et c'est toujours cassé
 
 # website
@@ -161,4 +160,4 @@ utiliser le bluetooth plutot que le wifi, pour plus de portabilité
 
 dans la chart, utiliser les dates plutot que rien actuellement
 
-# sources
+# Remerciement

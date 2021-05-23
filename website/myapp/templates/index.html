@@ -5,7 +5,7 @@
         <title>Peri Web Server</title>
         <link rel="stylesheet" type="text/css" href="{% static 'index.css' %}"/>
         <script src="static/js/jquery-3.6.0.min.js"></script>
-        <!-- <script src="static/js/paho-mqtt.js"></script> -->
+        <script src="static/js/paho-mqtt.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js" type="text/javascript"></script>
         <script src="static/js/led.js"></script>
     </head>
@@ -37,6 +37,15 @@
                 <p class="actualLed_txt">Voici la valeur actuelle de la led : </p>
                 <p id="actualLed_val" class="actualLed_val">Off</p>
             </div>
+            <script>
+                // Initialize a mqtt variable globally
+                console.log(mqtt)
+            </script>
+
+            <!-- <form method="POST">
+                {% csrf_token %}
+                <button type="submit" name="run_script">Run script</button>
+           </form> -->
             <div class="actualLED_section">
                 <p class="actualLed_txt">Vous pouvez changer l'état de la led en cliquant ici : </p>
                 <label class="switch">

@@ -1,7 +1,7 @@
 jQuery(document).ready(function($) {
     var client;
     var reconnectTimeout = 2000;
-    var host = "192.168.1.46";
+    var host = "162.168.1.46";
     var port = 1883;
 
     function onConnect(){
@@ -17,7 +17,7 @@ jQuery(document).ready(function($) {
             timeout: 3,
             onSuccess: onConnect,
         };
-        client.connect();
+        client.connect(option);
     }
 
     MQTTconnect();
@@ -25,10 +25,10 @@ jQuery(document).ready(function($) {
     $('#switchLed').click(function() {
         if($('#switchLed').is(':checked')){
             document.getElementById('actualLed_val').innerHTML = 'On';
-            // client.send("on");
+            client.send("on");
         }else{
             document.getElementById('actualLed_val').innerHTML = 'Off';
-            // client.send("off");
+            client.send("off");
         }
     });
  });

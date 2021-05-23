@@ -2,9 +2,38 @@
 #include <MQTTCredentials.h>
 #include <PubSubClient.h>
 #include <WiFi.h>
+/* librarire Oled */
+#include <Adafruit_GFX.h>
+#include <Adafruit_I2CDevice.h>
+#include <Adafruit_SSD1306.h>
 
 WiFiClient espClient;
 PubSubClient client(espClient);
+
+/********** POUR L'ECRAN **********/
+#define SCREEN_WIDTH 128  // OLED display width, in pixels
+#define SCREEN_HEIGHT 32  // OLED display height, in pixels
+
+#define OLED_RESET 16  // Reset pin # (or -1 if sharing Arduino reset pin)
+#define SCREEN_ADDRESS \
+  0x3C  ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
+
+TwoWire twi = TwoWire(1);  // our own TwoWire instance on bus 1
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &twi, OLED_RESET);
+
+#define NUMFLAKES 10  // Number of snowflakes in the animation example
+
+#define LOGO_HEIGHT 16
+#define LOGO_WIDTH 16
+
+static const unsigned char PROGMEM logo_bmp[] = {
+    B00000000, B11000000, B00000001, B11000000, B00000001, B11000000, B00000011,
+    B11100000, B11110011, B11100000, B11111110, B11111000, B01111110, B11111111,
+    B00110011, B10011111, B00011111, B11111100, B00001101, B01110000, B00011011,
+    B10100000, B00111111, B11100000, B00111111, B11110000, B01111100, B11110000,
+    B01110000, B01110000, B00000000, B00110000};
+
+/********** FIN POUR L'ECRAN **********/
 
 long lastMsg = 0;
 char msg[50];
@@ -17,14 +46,27 @@ void connectMQTT(void) {
   client.setCallback(callback);
 
   pinMode(LED_BUILTIN, OUTPUT);
+  /****  amorçage de l'écran OLED  ****/
+  twi.begin(4, 15);  // Needs to come before display.begin is used
+  // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
+  if (!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
+    Serial.println(F("SSD1306 allocation failed"));
+    for (;;)
+      ;  // Don't proceed, loop forever
+  }
+  display.setTextSize(2);  // Draw 2X-scale text
+  display.setTextColor(SSD1306_WHITE);
+  display.clearDisplay();
+  // Show initial display buffer contents on the screen --
+  // the library initializes this with an Adafruit splash screen.
+  display.display();
 }
 
 void callback(char* topic, byte* message, unsigned int length) {
   Serial.print("Message arrived on topic: ");
   Serial.print(topic);
   Serial.print(". Message: ");
-  String messageTemp;
-  int state;
+  String messageTemp = "";
 
   for (int i = 0; i < length; i++) {
     Serial.print((char)message[i]);
@@ -33,17 +75,22 @@ void callback(char* topic, byte* message, unsigned int length) {
   Serial.println();
 
   // If a message is received on the topic esp32/output, you check if the
-  // message is either "on" or "off". Changes the output state according to the
-  // message
+  // message is either "on" or "off".
+  // Changes the output state according to the message
   if (String(topic) == "esp32/input") {
-    Serial.print("Changing output to ");
-    state = digitalRead(LED_BUILTIN);
-    if (state == LOW) {
-      Serial.println("on");
+    if (String(messageTemp) == "LedOn") {
+      // on allume la LED
       digitalWrite(LED_BUILTIN, HIGH);
-    } else {
-      Serial.println("off");
+    } else if (String(messageTemp) == "LedOff") {
+      // on éteint la LED
       digitalWrite(LED_BUILTIN, LOW);
+    } else {
+      // on affiche sur l'écran Oled
+      display.clearDisplay();
+      // fonction de la valeurs
+      display.setCursor(20, 10);
+      display.println(messageTemp);
+      display.display();
     }
   }
 }
