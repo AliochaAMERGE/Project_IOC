@@ -44,7 +44,7 @@ Les données envoyées seront les valeurs de la photorésistance.
 &emsp;Au cours de ce micro-projet, nous voulons faire communiquer un ESP32 avec un raspberrypi, et ce au travers d'un broker MQTT.
 L'objectif est donc de récupérer les valeurs de la photorésistance de l'ESP32, les envoyées au broker MQTT implémenter sur le raspberrypi,
 qui à son tour, transfère les données sur le site web implémenter également sur le raspberrypi.
-
+Nous voulons également récupérer des *commandes* (des messages) depuis un formulaire sur le site web, qui effectuerons diverses actions sur l'ESP32.
 
 
 ## Matériel utilisé :
@@ -74,8 +74,8 @@ Dans ce micro-projet, le schéma sera le suivant :
 ![](/img/ourMQTT.png)
 
 Le raspberry héberge le broker MQTT et le site web. L'ESP32 produit les données via sa photorésistance.
-Les données de la photorésistance sont envoyé au broker via le topic esp32/output (valeurs entre 0 et 4000).
-L'utilisateur à la possibilité d'allumer ou éteindre la LED depuis le site web, les messages seront envoyé sur le topic /esp32/input et contiendront les valeurs "on" ou "off".
+Les données de la photorésistance sont envoyé au broker via le topic `esp32/output` (valeurs entre 0 et 4000).
+L'utilisateur à la possibilité d'effectuer différentes actions pré-configurée sur l'esp32 (allumer ou éteindre la LED, afficher un message sur l'écran OLED) directement depuis le site web. Nous utiliserons le topic `esp32.input`.
 
 ## Installation du broker MQTT sur la raspberry
 
@@ -84,40 +84,335 @@ L'utilisateur à la possibilité d'allumer ou éteindre la LED depuis le site we
 Source pour reproduire l'installation : 
 https://appcodelabs.com/introduction-to-iot-build-an-mqtt-server-using-raspberry-pi
 
-- 1. Install the mosquitto MQTT Broker 
+- 1. Installation de Broker MQTT Mosquitto
 
 `sudo apt install mosquitto mosquitto-clients`
 
-- 2. Enable the mosquitto broker
+- 2. Activation du broker mosquitto
     
-Enable the broker and allow it to auto-start after reboot using the following command:
+Active le broker et l'autorise à se lancer automatiquement après avoir redémarrer le raspberry
 `sudo systemctl enable mosquitto`
 
-- 3. Subscribe to the MQTT Topic Locally
+Si la connection est refusée lors d'un abonnement ou une publication, il peut être nécéssaire de redémarrer le démon mosquitto :
+`mosquitto -d`
 
-In the existing terminal, subscribe to the `test/message` topic:
+- 3. *Subscribe* à un topic MQTT (localement)
 
-terminal 1: 
+Nous effectuerons ces commandes sur deux terminaux distincts :
+Sur le terminal 1, abonnement au topic `test/message` :
 `mosquitto_sub -h localhost -t "test/message"`
 
-terminal 2: 
+Sur le terminal 2, nous publierons "Hello World" sur le topic `test/message` : 
 `mosquitto_pub -h localhost -t "test/message" -m "Hello, world"`
 
-Hello, world apparait sur le Terminal 1
+> Hello, world apparait sur le Terminal 1
+
+Notre broker Mosquitto est opérationnel, mais pour le moment il n'est accessible que localement. Dans le cadre du projet, nous le laisserons tel quel, mais pour une utilisation plus poussée, il sera nécéssaire d'ouvrir les ports pour un accès depuis l'extérieur (par exemple si nous hébergons le site via un service de cloud distant)
+
+Notre serveur MQTT étant installé sur le raspberry, il nous faut récupérer l'adresse de ce dernier pour pouvoir y accéder (même localement il est nécéssaire de le différencier d'autre appareil).
+Pour ce faire nous récupérons l'adresse avec :
+`hostname -I`
+Si le broker est installé sur Windows, il faudra utilisé la commande : 
+`ipconfig`
+
+Cette adresse sera utile à tous moment lorsque nous voulons converser avec le broker MQTT.
 
 
 # ESP32
 
-Dans cette section
-le code sur l'esp32 et ses limites (deconnection, meme si je crois que ça vient du fait qu'il recoit trop de message, on devrait tenter avec deux topic) c'est tenter avec deux topics et c'est toujours cassé
+&emsp;Nos objectifs sur l'esp32 sont de gérer deux topics : `esp32/output` duquel nous enverrons les données de la photorésistance, et `esp32/input` duquel nous recevrons des *commandes* ayant différentes actions.
 
-# website
+Nous utiliserons [Visual Studio Code](https://code.visualstudio.com/) avec l'extension intégrant l'IDE [PlatformIO](https://platformio.org/) pour réaliser toute la partie sur l'ESP32.
+Cette extension est extrêmement compléte et bien documentée, la gestion des librairies est simplifiée, et toutes les opérations sont intuitives et ou documentée.
 
-ce que l'on voulait faire, quel outils etc, rapidement, c'est l'intro de la partie
+Nous aurons besoin d'importer 3 librairies :
+- PubSub : pour gérer la communication avec le broker
+`pio lib install "knolleary/PubSubClient"`
+- Adafruit GFX Library : librarie graphique
+`pio lib install "adafruit/Adafruit GFX Library"`
+- Adafruit SSD1306 : librairie de driver oled SSD1306 pour des écrans monochrome 128x64 et 128x32
+`pio lib install "adafruit/Adafruit SSD1306"`
 
-## installation du serveur Django
+Nous utiliserons également les libraires suivantes :
+`Arduino.h`, `WiFi.h`, `SPI.h` et `Wire.h`
 
-pourquoi django, et rapide mise en place
+## Déroulement de l'algorithme
+
+- **Programmation sur Arduino (esp32) :**
+
+La programmation sur esp32 fonctionne de la même façon que la programmation sur Arduino :
+Le code nécéssite deux méthodes : `void setup();` et `void loop();`
+
+  - `void setup();`
+
+Le code sera éffectué une fois au démarrage de l'esp32, il sert notamment à l'initiatlisation des variables, ou toutes actions que nous ne réalisons qu'une fois.
+Nous pouvons appeler d'autre méthodes dans le `setup()`, ces méthodes seront executée une unique fois.
+
+  - `void loop();`
+
+Le code sera effectué périodiquement, c'est en quelque sorte un `while(true)`. Nous réalisons les différentes actions de notre code dans cette méthode. 
+Nous pourrons appeler d'autre méthodes dans le `loop()`, ces méthodes seront exécutée séquentiellement jusqu'à arrêt du programme.
+
+Les programmes Arduino peuvent en gérénal est réprésenté sous la forme de diagramme d'état, en voici un exemple :
+```mermaid
+graph LR
+  START ==> setup1
+  subgraph setup
+  setup1 --> setup2 
+  end
+  setup2 ==> loop1
+  subgraph loop
+  loop1 --> loop2 --> loop3 --> loop1
+  end
+```
+*Ici, nous avons 2 méthodes appelés dans le setup(), et 3 méthodes dans le loop().*
+
+- **Notre implémentation :**
+
+Fichier : [*esp32/src/main.cpp](esp32/src/main.cpp)
+
+**Les variables**
+
+```cpp
+// Le broker
+WiFiClient espClient;
+PubSubClient client(espClient);
+// l'écran
+Adafruit_SSD1306 display
+```
+
+**setup()**
+```cpp
+void setup(){
+  // Connection au WiFi
+  ConnectWifi();
+  // Connection au broker MQTT & subscribe aux topics désirés
+  ConnectMQTT();
+  // et c'est tout, les autres fonctionnalités sont gérée dans ConnectMQTT()
+}
+```
+**loop()**
+
+```cpp
+void loop(){
+  // se reconnecter au broker en cas de déconnection
+  if (!client.connected()) {
+    reconnect();
+  }
+  // l'attente de réception des messages du broker
+  client.loop();
+
+  /**** Envoie des messages sur esp32/output ****/
+  /*    expliciter dans une prochaine partie    */
+}
+```
+
+## Connection au broker MQTT
+
+### Connection WiFi
+
+Afin de nous connecter au broker MQTT, nous aurons tout d'abord besoin de nous connecter au WiFi.
+Pour cela, nous aurons besoin de la librairie `WiFi.h` :
+Fichier : [*esp32/include/WifiConfig.h*](esp32/include/WifiConfig.h)
+
+```cpp
+void connectWifi(void) {
+  // connection en fonction des identifiants et mot de passe fournis
+  WiFi.begin(SSID, WiFiPassword);
+  // Attente bloquante tant que la connection n'a pas abouti
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+  }
+}
+```
+
+Les identifiants (SSID) et mot de passe (WiFiPassword) seront indiqués dans le fichier */esp32/include/WiFiCredentials.h* contenant ces deux variables :
+```cpp
+const char *SSID = "xxxxxxx";
+const char *WiFiPassword = "xxxxxxxx";
+```
+
+**ATTENTION : Ce dernier devra être créé par l'utilisateur, et modifier en cas de changement de réseau WiFi**
+
+### Connection au broker MQTT
+
+Une fois la connection WiFi établie, nous pouvons nous connecter au broker MQTT.
+De la même manière que le WiFi, les informations de connection seront stockées dans un fichier */esp32/include/MQTTCredentials.h* contenant : 
+```cpp
+const char* mqtt_server = "xxx.xxx.x.xx";
+const int mqtt_port = 1883;  // port par défaut
+```
+
+```cpp
+// Connection au serveur 
+client.setServer(mqtt_server, mqtt_port);
+// Gestion du callback
+client.setCallback(callback);
+// abonnnement au topic esp32/input
+client.subscribe("esp32/input")
+```
+La méthode `setCallback()` prend en paramètre un pointeur sur fonction et indiquera la procédure à réaliser en cas de réception d'un message. Nous expliciterons cette méthode ultérieurement.
+
+La souscription sera également explicitée par la suite.
+
+En cas de déconnection au serveur, la méthode `void reconnect()` est appelée : 
+```cpp
+void reconnect() {
+  // Loop until we're reconnected
+  while (!client.connected()) {
+    Serial.print("Attempting MQTT connection...");
+    // Attempt to connect
+    if (client.connect("ESP8266Client")) {
+      Serial.println("connected");
+      // Subscribe
+      client.subscribe("esp32/input");
+    } else {
+      Serial.print("failed, rc=");
+      Serial.print(client.state());
+      Serial.println(" try again in 5 seconds");
+      // Wait 5 seconds before retrying
+      delay(5000);
+    }
+  }
+}
+```
+Nous relançons tout simplement la connection au serveur, ainsi que les abonnements aux topics nécéssaire.
+
+A ce niveau, nous avons établis une connection au WiFi et au broker MQTT, mais nous ne recevons ni n'envoyons de données vers ce dernier, c'est ce que nous verrons par la suite.
+
+Nous mettons en place maintenant deux topics, un pour les messages entrants, et un pour les messages sortants.
+
+## esp32/output
+
+Ce topic concerne les données *sortantes* de l'esp32 vers le site web, c'est à dire dans notre implémentation, les valeurs captée par la photorésistance.
+Cette valeurs lu toutes les secondes, puis envoyé au broker :
+```cpp
+long now = millis();
+if (now - lastMsg > 1000) {
+  lastMsg = now;
+  lumos = analogRead(PHOTORESISTANCE_PIN);
+
+  /* Convert the value to a char array */
+  char tempString[8];
+  dtostrf(lumos, 1, 2, tempString);
+  Serial.print("value = ");
+  Serial.println(tempString);
+
+  client.publish("esp32/output", tempString);
+}
+```
+Nous verifions si le délai d'une seconde depuis le dernier envoie est atteint (d'une manière très similaire au waitFor() vu au cours du TME 3).
+Ensuite nous récupérons la valeurs de la photorésistance avec `analogRead(byte pin)`. Cette valeurs est comprise entre 0 et 4000 (du plus clair au plus sombre). Elle est ensuite convertie en une chaine de caractère, puis publiée sur le topic `esp32/ouput`.
+
+## esp32/input
+
+Ce topic concerne les données *entrantes* vers l'esp32 depuis le site web, ce sont des *commandes* depuis le site web.
+Pour le moment, nous avons 3 commandes mise en place :
+- LedOn : allume la Led
+- LedOff : éteint la Led
+- autre : affiche le contenu du message sur l'écran OLED
+
+Ces messages sont gérer dans la fonction `callback()` précedemment énoncé :
+
+```cpp
+void callback(char* topic, byte* message, unsigned int length) {
+  
+  // permet de traduire le message (tableau de byte) en String
+  String messageTemp = "";
+  for (int i = 0; i < length; i++) {
+    messageTemp += (char)message[i];
+  }
+  pinMode(LED_BUILTIN, OUTPUT);
+
+  // Si nous recevons un message du topic esp32/input
+  if (String(topic) == "esp32/input") {
+    // si message est la commande "LedOn"
+    if (String(messageTemp) == "LedOn") {
+      // on allume la LED
+      digitalWrite(LED_BUILTIN, HIGH);
+    } else
+    // si message est la commande "LedOff"
+     if (String(messageTemp) == "LedOff") {
+      // on éteint la LED
+      digitalWrite(LED_BUILTIN, LOW);
+    } else {
+      // on affiche le contenu du message sur l'écran Oled
+      display.clearDisplay();       // efface le display
+      display.setCursor(20, 10);    // place le curseur
+      display.println(messageTemp); // écrit le message dans le buffer
+      display.display();            // affiche le contenu du buffer
+    }
+  }
+}
+```
+L'abonnement au topic `esp32/input` se fait à la connection et / ou à la reconnection au broker MQTT.
+
+Le code est plutot explicite, lors de la récetion d'un message, nous le convertissions en String, si le topic du message est `esp32/input`, nous le traitons.
+Cette verification est utile si nous nous abonnons à plusieurs topics (ce qui n'est pas le cas dans notre implémentation).
+Nous passons le mode du pin concernant la Led en OUTPUT afin de pouvoir écrire une valeurs (HIGH ou LOW), si nous recevons "LedOn" nous allumons la Led, et inversement si nous recevons "LedOff". Si nous recevons un autre message, ce dernier sera afficher sur l'écran (ne fonctionne que pour des messages relativement court pour le moment, mais cela est facilement modifiable en fonction des besoins).
+
+Pour utiliser l'écran, nous avons besoin de réaliser plusieurs opérations sur ce dernier au préalable qui sont expliqués dans le lien suivant : https://mansfield-devine.com/speculatrix/2019/01/ttgo-esp32-oled-display/
+
+# TODO image montrant un affichage sur lécran OLED
+
+## Limites de l'implémentation
+
+- Problème : 
+
+Cette implémentation montre tout de même quelques défauts. Tout d'abord, il est nécéssaire de rentrer les identifiants et mots de passe du WiFi et du broker *en dur* à chaque changement de réseau WiFi ou de broker. En cas de partage du code, ces données apparaissent en clair et ne sont pas criptées, ce qui peux provoquer un risque d'un point de vue sécurité.
+
+- Idée de résolution :
+
+Il faudrait chiffré les identifiants en utilisant une clé de chiffrement propre aux utilisateurs, mais cela demande d'implémenter un algorithme suplémentaire pour déchiffrer ces données, propre à chaque personne, ce qui ne rend pas le code plus facilement distribuable.
+Nous pourrions également faire une demande d'argument à l'exécution, ce qui serait plus simple mais non persistant.
+
+- Problème :
+
+Nous faisons face à des déconnection récurrente, et des retards dans les envoies / réceptions de messages en lien avec le broker.
+
+- Idée de résolution :
+
+Celà est peut-être lié à un problème de performance matériel, auquel cas le seul changement possible est de changer de modèle d'ESP32. Sinon, le problème est lié à une instabilité du réseau (ce qui est improbable dans les conditions de test).
+
+## Résumé
+
+L'implémentation sur l'esp32 est terminée.
+Nous avons connecté l'esp32 au WiFi et au broker MQTT.
+Nous avons créer deux topic, un pour les messages entrants (`esp32/input`), un pour les messages sortants(`esp32/ouput`).
+Le topic pour les messages sortants concerne les valeurs de la photorésistance, le topic concernant les messages entrants concerne des commandes traitées par l'esp32.
+Ces commandes sont  { "LedOn" : allume la Led, "LedOff" : éteint la Led, "autre" : affiche la commande sur l'écran.
+
+# Website
+
+Nous attaquons la partie le plus conséquente de ce micro-projet, et celle qui nous a demandé le plus de temps, et le plus de lecture de documentation.
+
+## Objectifs
+
+Nous voulons faire un serveur HTTP récupérant les données émises par l'esp32 via le broker MQTT. Nous voulons également pouvoir envoyé des commandes via un formulaire, sur l'ESP32, toujours au travers du broker.
+
+Pour ce faire nous avons décidé d'utiliser le [framework Django](https://www.djangoproject.com/)
+
+## Installation du serveur Django
+
+### Pourquoi Django ?
+
+Nous avons choisis d'utiliser Django pour plusieurs raisons :
+
+- Framework reconnu et beaucoup utilisé : 
+
+Apprendre à créer un serveur Django est beaucoup demandé, et nous sera toujours utilse d'un point de vue professionnel, et personnel si nous voulons complexifié notre serveur.
+
+- Performance : 
+
+Nous faisions face à des soucis de performance et de forte utilisation des ressources matérielles lors de la mise en place d'un serveur HTTP *basics*. Ces problèmes n'ont pas été apperçu avec le serveur Django.
+
+- Faciliter d'impléméntation : 
+
+Au début de ce projet, nous pensions que le site web serait un *support* et que le partie importante du code était sur l'esp32, nous nous étions lourdement trompé. Le framework étant implémenter en python, déstiné au *grand public*, et disposant d'une documentation riche (ainsi que d'une grande variété de ressources tierces en ligne), l'implémentation du serveur est très simple.
+
+### Création du serveur Django
+
+
 
 ## création de la base de donnée
 

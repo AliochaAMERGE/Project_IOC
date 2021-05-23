@@ -7,7 +7,7 @@
 #include "WifiConfig.h"
 
 
-// use onboard LED for convenience
+// pin de la photorésistance
 #define PHOTORESISTANCE_PIN 36
 // maximum received message length
 #define MAX_MSG_LEN (128)

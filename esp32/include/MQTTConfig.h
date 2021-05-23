@@ -42,8 +42,12 @@ int value = 0;
 void callback(char* topic, byte* message, unsigned int length);
 
 void connectMQTT(void) {
-  client.setServer(mqtt_server, 1883);
+  // Connection au serveur
+  client.setServer(mqtt_server, mqtt_port);
+  // Gestion du callback
   client.setCallback(callback);
+  // abonnnement au topic esp32/input
+  client.subscribe("esp32/input");
 
   pinMode(LED_BUILTIN, OUTPUT);
   /****  amorçage de l'écran OLED  ****/
@@ -73,24 +77,24 @@ void callback(char* topic, byte* message, unsigned int length) {
     messageTemp += (char)message[i];
   }
   Serial.println();
+  pinMode(LED_BUILTIN, OUTPUT);
 
-  // If a message is received on the topic esp32/output, you check if the
-  // message is either "on" or "off".
-  // Changes the output state according to the message
+  // Si nous recevons un message du topic esp32/input
   if (String(topic) == "esp32/input") {
+    // si message est la commande "LedOn"
     if (String(messageTemp) == "LedOn") {
       // on allume la LED
       digitalWrite(LED_BUILTIN, HIGH);
-    } else if (String(messageTemp) == "LedOff") {
+    } else  // si message est la commande "LedOff"
+        if (String(messageTemp) == "LedOff") {
       // on éteint la LED
       digitalWrite(LED_BUILTIN, LOW);
     } else {
-      // on affiche sur l'écran Oled
-      display.clearDisplay();
-      // fonction de la valeurs
-      display.setCursor(20, 10);
-      display.println(messageTemp);
-      display.display();
+      // on affiche le contenu du message sur l'écran Oled
+      display.clearDisplay();        // efface le display
+      display.setCursor(20, 10);     // place le curseur
+      display.println(messageTemp);  // écrit le message dans le buffer
+      display.display();             // affiche le contenu du buffer
     }
   }
 }
