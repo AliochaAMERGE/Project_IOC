@@ -455,7 +455,8 @@ Arborescence détaillée du serveur Django
 ├── myapp       ~ application énoncée ci-dessus, les opérations sont réalisé ici
 │   ├── admin.py  ~ gestion administrateur de l'app, auto générér non modifié
 │   ├── apps.py   ~ paramètre de l'app, auto générér non modifié
-│   ├── __init__.py  ~ programme python exécuter au démarrage du serveur, explicité plus tard dans le rapport
+│   ├── __init__.py  ~ programme python exécuter au démarrage du serveur, 
+|   |                               explicité plus tard dans le rapport
 │   ├── migrations   ~ dossier auto générer gérant les migrations
 │   │   └── [...]  
 │   ├── models.py    ~ création des tables pour la base de donnée
@@ -470,15 +471,15 @@ Arborescence détaillée du serveur Django
 ├── pioc_website   ~ Le serveur Django ~
 │   ├── asgi.py  
 │   ├── __init__.py  ~ même chose que myapp, non exploit
-│   ├── __pycache__
-  ~ cache│   │   └── w[...] │   ├── settings.py
-   ~ paramètre du serveur, nous indiquerons les app et les paths utile au serveur│   ├── urls.py
-   ~ route du serveur, nous définirons myapp comme la route principale│   └── wsgi.py
-  ├── requirements
-   ~ dépendances du serveur│   ├── dev.txt
+│   ├── __pycache__  ~ cache
+│   │   └── w[...] 
+│   ├── settings.py   ~ paramètre du serveur, nous indiquerons les app et les paths utile au serveur
+│   ├── urls.py   ~ route du serveur, nous définirons myapp comme la route principale
+│   └── wsgi.py
+├── requirements   ~ dépendances du serveur
+│   ├── dev.txt
 │   └── prod.txt
-└── static
-     ~ Dossier contenant les élements statics pour les rendus (images, CSS, javascripts)
+└── static     ~ Dossier contenant les élements statics pour les rendus (images, CSS, javascripts)
     └── [...]
 ```
 
