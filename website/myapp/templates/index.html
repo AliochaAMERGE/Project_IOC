@@ -7,13 +7,12 @@
         <script src="static/js/jquery-3.6.0.min.js"></script>
         <script src="static/js/paho-mqtt.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js" type="text/javascript"></script>
-        <script src="static/js/led.js"></script>
     </head>
     <body>
         <div class="sommaire">
             <img class="su" src="static/Sciences_SU.png" />
             <img class="peri" src= "static/peri.png" />
-            <H1 class="titre">Bienvenue sur notre server MQTT</H1>
+            <H1 class="titre">Bienvenue sur notre projet IOC</H1>
             <ul class="liste">
                 <li class="liste_elem">Vous voulez voir la valeur actuelle de notre photoresistance ? <a href="#actualVal">cliquez ici</a></li>
                 <li class="liste_elem">Vous voulez voir si la led est allumer ou bien interagir avec ? <a href="#actualLED">cliquez ici</a></li>
@@ -22,107 +21,88 @@
         </div>    
         
         <div id="actualVal" class="actualVal">
-            <h2 class=section_title>PHOTORESISTANCE</h2>
+            <h2 class="section_title section_photo">PHOTORESISTANCE</h2>
             <div class="actualVal_content">
                 <p class="actualVal_txt">Voici la valeur actuelle de notre photoresistance : </p>
+                    <!-- Valeurs passée en paramètre du rendu -->
                 <p id="current_value" class="actualVal_val">{{value}}</p>
-            
             </div>
         </div>
         
-        <div id="actualLED" class="actualLed">
-            <h2 class=section_title>LED</h2>
-
-
-            <div class="actualLED_section">
-                <p class="actualLed_txt">Voici la valeur actuelle de la led : </p>
-                <p id="actualLed_val" class="actualLed_val">Off</p>
-            </div>
+        <div id="actualMSG" class="actualMSG">
+            <h2 class=section_title>Envoyer des messages</h2>
             <script>
-                // Initialize a mqtt variable globally
-                console.log(mqtt)
             </script>
-            <div class="actualLED_section">
-                <p class="actualLed_txt">Vous pouvez changer l'état de la led en cliquant ici : </p>
+            <div class="actualMSG_section">
+                <p class="actualMSG_txt">Vous pouvez changer l'état de la led en cliquant ici : </p>
                 <label class="switch">
-                    <input id="switchLed" type="checkbox">
+                    <input id="switchMSG" type="checkbox">
                     <span class="slider round"></span>
                 </label>
             </div>
             <form method="post">
                 {%csrf_token%}
-                <label for="input">Enter command: </label>
-                <input id="esp32_input" type="text" name="esp32_input">
-                <input type="submit" value="OK">
+                <label for="input">Veuillez entrer une commande : </label>
+                <input class="input_msg" id="esp32_input" type="text" name="esp32_input" placeholder="exemple : LedOn">
+                <input class="submit" type="submit" value="OK">
             </form>
             
         </div>
 
         <div id="graphique" class="graphique">
             <h2 class=section_title>GRAPHIQUE</h2>
-            <p class="graphique_txt">Voici notre graphique représentant l'évolution des valeurs communiqué par notre photorésistance</p>
+            <p class="graphique_txt">Voici le graphique représentant l'évolution des valeurs communiqué par la photorésistance</p>
             
             <script type="text/javascript">
                 var element = document.getElementById("current_value")
-
                 window.onload = function () {
-
-                    dps = [];
-                    
-                    $.getJSON('/data', function(data) {
-                        for (let index = 10; index >= 0; index--) {
-                            dps.push({x: 10-index, y: data[index].value});
-                        }
-                    }); 
-            
+                  // Notre data points
+                  dps = [];
+                  // Nous récupérons les données au format JSON depuis la route "/data"
+                  $.getJSON('/data', function(data) {
+                      // Valeurs initiales affichée sur le graphe
+                      for (let index = 10; index >= 0; index--) {
+                          dps.push({x: 10-index, y: data[index].value});
+                      }
+                  }); 
+                  // Format du graphe
                   var chart = new CanvasJS.Chart("chartContainer",{
                       theme: "light1",
-                      title :{
-                          text: "Live Data"
-                      },
-                      axisX: {						
-                          title: ""
-                      },
-                      axisY: {						
-                          title: ""
-                      },
+                      title :{  text: "Live Data"  },
+                      axisX: {  title: "" },
+                      axisY: {	title: "" },
                       data: [{
                           type: "line",
                           dataPoints : dps,
                           color :"purple"
                       }]
                   });
-            
+                  // Afficher le graphge
                   chart.render();
                   var xVal = 10 + 1;
                   var yVal = 15;	
                   var updateInterval = 1000;
-            
+                  // Mise à jour du graphe toutes les secondes 
+                  // (en lien avec la fréquence d'envoie de message sur l'ESP32)
                   var updateChart = function () {
-
+                    // Nous récupérons les nouvelles données
                     $.getJSON('/data', function(data) {
-
-                        dps.push({x: xVal, y: data[0].value});
-                        element.innerHTML = data[0].value;
-
+                      // ajout de cette donnée dans notre liste de point
+                      dps.push({x: xVal, y: data[0].value});
+                      // Mise à jour de la valeurs de la photorésistence 
+                      element.innerHTML = data[0].value;
                     }); 
-                       
-                      xVal++;
-                      if (dps.length >  10 )
-                      {
-                          dps.shift();				
-                      }
-            
-                      chart.render();		
-            
-                // update chart after specified time. 
-            
-            };
-            
-            setInterval(function(){updateChart()}, updateInterval); 
-            }
-            </script>
-            <script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+                    xVal++;
+                    // Décalage du graphe et réaffichage avec la nouvelle valeurs
+                    if (dps.length >  10 ) {
+                        dps.shift();				
+                    }
+                    chart.render();		
+                  };
+                  setInterval(function(){updateChart()}, updateInterval); 
+                }
+              </script>
+              <script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
             </head>
             <body>
                 <div id="chartContainer" style="height: 300px; width: 100%;">
@@ -134,13 +114,10 @@
     
 
     <footer class="footer">
-        <p class="footer_txt">Ce site concerne notre projet d'IOC, nous avons pour but de récuperer 
-            la valeur lu sur une photoresistance venant d'un esp32.<br>Celui-ci doit transmettre 
-            l'information toute les x secondes afin d'avoir les données mise a jour.<br>Par la suite, 
-            nous avons voulu ajouter quelque fonctionnalité tel que le controle de la led
-            depuis le site (connaitre son état et le modifier), avoir un graphique représentant les valeurs lu de la photoresistance 
-            ainsi qu'un historique de toute ces valeurs.</p>
-        <p class="footer_txt">Merci a notre professeur, Mr Franck Wajsburt pour cette UE, son investissement et son envie prenante d'enseigner</p>
+        <p class="footer_txt">Voici la page Web de notre micro-projet d'IOC [ MU4IN109 - S2 ] dans le cadre de notre Master 1 mention SAR à Sorbonne Université.<br>
+            L'objectif de ce projet est de transmettre des informations entre un ESP32 et un serveur HTTP héberger sur un raspberry, et ce au travers d'un broker MQTT.</p>
+        <p class="footer_txt">Le code source  de ce projet est disponible sur le lien suivant : <a href="https://github.com/AliochaAMERGE/Project_IOC">https://github.com/AliochaAMERGE/Project_IOC</a></p>
+        <p class="footer_txt">Merci à notre professeur, Mr Franck Wajsburt pour cette UE, son investissement et son envie prenante d'enseigner</p>
         <p class="footer_txt">Pour se rendre sur la page de l'UE vous pouvez <a href="https://www-soc.lip6.fr/trac/sesi-peri/">cliquer ici</a></p>
         <p class="footer_txt author"> By Ouersighni Haitham & Amerge Aliocha</p>
     </footer>

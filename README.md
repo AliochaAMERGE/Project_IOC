@@ -347,7 +347,7 @@ Nous passons le mode du pin concernant la Led en OUTPUT afin de pouvoir écrire 
 
 Pour utiliser l'écran, nous avons besoin de réaliser plusieurs opérations sur ce dernier au préalable qui sont expliqués dans le lien suivant : https://mansfield-devine.com/speculatrix/2019/01/ttgo-esp32-oled-display/
 
-# TODO image montrant un affichage sur lécran OLED
+<img src="img/OledExample.jpg" width=400/>
 
 ## Limites de l'implémentation
 
@@ -403,6 +403,8 @@ Nous faisions face à des soucis de performance et de forte utilisation des ress
 - Faciliter d'impléméntation : 
 
 Au début de ce projet, nous pensions que le site web serait un *support* et que le partie importante du code était sur l'esp32, nous nous étions lourdement trompé. Le framework étant implémenter en python, déstiné au *grand public*, et disposant d'une documentation riche (ainsi que d'une grande variété de ressources tierces en ligne), l'implémentation du serveur est très simple.
+
+"*Django : The web framework for perfectionists with deadlines.*"
 
 ### Création du serveur Django
 
@@ -581,6 +583,8 @@ client.connect("192.168.1.46", 1883)
 
 ```
 
+Nous faisons l'import de la Table *Data* dans la méthode car au lancement du serveur, les apps ne sont pas chargée de suite, il en est de même pour la table et de ce fait, l'import n'était pas reconnu.
+
 Lors de la connection au broker, nous nous abonnons au topic `esp32/output` pour recevoir les données de l'esp32.
 
 Lors de la réception d'un message, nous créons une nouvelle entité dans notre table avec la valeurs récupérée du message. L'identifiant de l'esp32 est entré "*en dur*" pour le moment, mais nous pouvons utilisé le champs *userdata* pour avoir un identifiant plus cohérent.
@@ -596,6 +600,8 @@ Notre base de donnée se rempli au fur et à mesure de la réception des message
 - Limites de notre implémentation :
 
 Si un message arrive sur le topic `esp32/output` contenant autre chose qu'un entier, une erreur de conversion sera lancée.
+
+Attention, à partir de ce moment nous avons besoin d'ajouter le flag `--noreload` lors du lancement du serveur. Autrement le serveur essayais de s'abonner au topic à nouveau, et nous recevions tous les messages deux fois.
 
 ### esp32/input
 
@@ -655,7 +661,21 @@ Nous avons donc décidé d'implémenter l'envoie de commande à la réception d'
 Nous avons un entrelacement du *front end* provenant du fichier HTML, avec le *back end* gérer par le serveur Django.
 Nous utiliserons un [formulaire HTML](https://docs.djangoproject.com/fr/2.2/topics/forms/).
 
-Nous verrons son implémentation dans la partie HTML plus tard, grossièrement, lorsque l'utilisateur entre des données dans le formulaire, une requete "*POST*" est envoyée, cette dernières est récupérée dans [/myappp/views.py](website/myapp/views.py) :
+<form method="post">
+    {%csrf_token%}
+    <label for="input">Veuillez entrer une commande : </label>
+    <input class="input_msg" id="esp32_input" type="text" name="esp32_input" placeholder="exemple : LedOn">
+    <input class="submit" type="submit" value="OK">
+</form>
+
+![](img/CommandeExample.png)
+
+
+Cette commande affichera ce super message sur notre écran :
+
+<img src="img/OledExample.jpg" width=400/>
+
+Lorsque l'utilisateur entre des données dans le formulaire, une requete "*POST*" est envoyée, cette dernières est récupérée dans [/myappp/views.py](website/myapp/views.py) :
 
 ```py
 def index(request):
@@ -671,7 +691,7 @@ def index(request):
   return render(request, "index.html", {f"value": data.value})
 ```
 
-Nous n'avons pas besoin de maintenir une connection constante avec le broker car les envoies de commandes seront isolées, nous publions sur le topic `esp32/input` la commande entrée par l'utilisateur, et nous déconnectons proprement.
+Vu que nous n'avons pas besoin de maintenir une connection constante avec le broker,  les envoies de commandes étant isolés, nous utilisons `publish.single()`. Cela permettra d'établir une connection d'envoyer le message et de se déconnecté juste après.
 
 - Inconvénients :
   - Lors d'un envoie de commande, un nouveau rendu de la page est réalisé ce qui provoque une *actualisation*.
@@ -689,33 +709,107 @@ Nous n'utiliserons qu'une route, et un unique fichier HTML. Toutes les autres ro
 ### HTML
 
 Ce fichier contiendra l'ensemble des données affichée sur notre page Web tel que vous pouvez la voir.
-Ces données sont séparée en plusieurs sections :
 
-#### Le titre et les imports
+#### Passage d'une valeurs en paramètre du rendu
 
-#### Le sommaire
+Tout d'abord nous affichons les dernières valeurs de la photorésistance sur le site : 
 
-#### La valeurs de la photorésistance
+![](img/photovalue.png)
 
-#### La valeurs de la Led
+Cette valeurs la dernière valeurs en date de la base de donnée. Au lancement du site elle est récupérée et passé en paramètre lors du rendu. 
 
-### views
+Fichier [*myapp/views.py](website/myapp/views.py) :
+```py
+def index(request):
+  # si requete POST provenant du formulaire
+  if request.method == 'POST' and 'esp32_input' in request.POST:
+    # publication de la commande
+    publish.single("esp32/input", request.POST.get("esp32_input"), hostname="192.168.1.46")
+  template = loader.get_template("index.html")
+  # nous récupérons la dernière valeurs de la base de donnée.
+  data = Data.objects.order_by("-pub_date").all()[0]
+  return render(request, "index.html", {f"value": data.value})
+```
+Cette valeurs est ensuite récupérée et affichée : 
+```html
+<div class="actualVal_content">
+    <p class="actualVal_txt">Voici la valeur actuelle de notre photoresistance : </p>
+    <!-- Valeurs passée en paramètre du rendu -->
+    <p id="current_value" class="actualVal_val">{{value}}</p>
+</div>
+```
 
-### /data
+#### Passage d'une valeurs via une route dédiée
+
+Nous voulons maintenant récupérér plusieurs valeurs, et ce sans avoir besoin de générer un nouveau rendu à chaque fois.
+Pour faire celà, nous créons une nouvelle route que nous appelerons "/data", contenant une *JacksonResponse*.
+Soit une réponse au format JSON des 50 dernières valeurs de notre base de donnée.
+Fichier [*myapp/views.py](website/myapp/views.py) :
+
+```py
+def get_data(request):
+  data = list(Data.objects.order_by("-pub_date").values()[:50]) 
+  return JsonResponse(data, safe=False)
+```
+![](img/JsonResponse.png)
 
 ### Live data
 
+Nous utilisons ces valeurs afin d'afficher une charte évolutive à l'aide de [CanvasJs](CanvasJS.com).
+```html
+<script type="text/javascript">
+  var element = document.getElementById("current_value")
+  window.onload = function () {
+    // Notre data points
+    dps = [];
+    // Nous récupérons les données au format JSON depuis la route "/data"
+    $.getJSON('/data', function(data) {
+        // Valeurs initiales affichée sur le graphe
+        for (let index = 10; index >= 0; index--) {
+            dps.push({x: 10-index, y: data[index].value});
+        }
+    }); 
+    // Format du graphe
+    var chart = new CanvasJS.Chart("chartContainer",{
+        theme: "light1",
+        title :{  text: "Live Data"  },
+        axisX: {  title: "" },
+        axisY: {	title: "" },
+        data: [{
+            type: "line",
+            dataPoints : dps,
+            color :"purple"
+        }]
+    });
+    // Afficher le graphge
+    chart.render();
+    var xVal = 10 + 1;
+    var yVal = 15;	
+    var updateInterval = 1000;
+    // Mise à jour du graphe toutes les secondes 
+    // (en lien avec la fréquence d'envoie de message sur l'ESP32)
+    var updateChart = function () {
+      // Nous récupérons les nouvelles données
+      $.getJSON('/data', function(data) {
+        // ajout de cette donnée dans notre liste de point
+        dps.push({x: xVal, y: data[0].value});
+        // Mise à jour de la valeurs de la photorésistence 
+        element.innerHTML = data[0].value;
+      }); 
+      xVal++;
+      // Décalage du graphe et réaffichage avec la nouvelle valeurs
+      if (dps.length >  10 ) {
+          dps.shift();				
+      }
+      chart.render();		
+    };
+    setInterval(function(){updateChart()}, updateInterval); 
+  }
+</script>
+<script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+```
+
 ![LiveData](img/LiveDataIOC.gif)
-
-
-Récupération des données de la BDD et création de la route /data en json
-
-views python
-html
-css
-js et graphe
-
-limite du graphe
 
 # conclusion
 

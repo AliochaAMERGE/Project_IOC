@@ -3,7 +3,7 @@
     src: url('fonts/Agilia.ttf');
 }   
 
-.sommaire, .actualVal, .actualLed, .graphique{
+.sommaire, .actualVal, .actualMSG, .graphique{
     padding: 40px;
     border-bottom: 1px solid black;
 }
@@ -20,9 +20,13 @@
     font-size: 36px;
     margin-bottom: 60px;
     margin-top: 40px;
+    text-decoration: underline;
+    color: #52B5E5;
 }
 .liste{
-    border: 2px solid black;
+    border: 2px solid;
+    border-color: #1D2769;
+    border-top: 2px solid #52B5E5;
     padding: 20px;
 }
 
@@ -36,11 +40,17 @@
 a{
     color: black;
 }
-.actualVal, .actualLed{
+.actualVal, .actualMSG{
     float: left;
     padding: 40px 0 40px 0;
     height: 207px;
     width: 50%;
+}
+.section_title{
+    color: #1D2769;
+}
+.section_photo,.actualVal_txt{
+    padding-left: 40px;
 }
 .actualVal_content{
     text-align: center;
@@ -48,24 +58,19 @@ a{
 .actualVal_txt{
     float: left;
     margin-right: 20px;
+    font-size: 18px;
 }
 .actualVal_val{
     float: left;
+    margin: 18px;
+    font-size: 18px;
 }
-.actualLed_section{
+.actualMSG_section{
     display: flow-root;
 }
-.actualLed_txt{
+.actualMSG_txt{
     float: left;
     margin-right: 20px;
-}
-.actualLed_val{
-    float: left;
-    text-transform: uppercase;
-    border: 2px solid black;
-    padding: 5px 15px;
-    margin-top: 8px;
-    font-weight: bold;
 }
 .switch {
     position: relative;
@@ -73,63 +78,83 @@ a{
     width: 60px;
     height: 26px;
     top: 10px;
-  }
+}
   
-  /* Hide default HTML checkbox */
-  .switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-  }
-  
-  /* The slider */
-  .slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    -webkit-transition: .4s;
-    transition: .4s;
-  }
-  
-  .slider:before {
-    position: absolute;
-    content: "";
-    height: 20px;
-    width: 20px;
-    left: 5px;
-    bottom: 3px;
-    background-color: white;
-    -webkit-transition: .4s;
-    transition: .4s;
-  }
-  
-  input:checked + .slider {
-    background-color: #ea5bbe;
-  }
-  
-  input:focus + .slider {
-    box-shadow: 0 0 1px #ea5bbe;
-  }
-  
-  input:checked + .slider:before {
-    -webkit-transform: translateX(30px);
-    -ms-transform: translateX(30px);
-    transform: translateX(30px);
-  }
-  
-  /* Rounded sliders */
-  .slider.round {
-    border-radius: 34px;
-  }
-  
-  .slider.round:before {
-    border-radius: 50%;
-  }
+/* Hide default HTML checkbox */
+.switch input {
+opacity: 0;
+width: 0;
+height: 0;
+}
 
+/* The slider */
+.slider {
+position: absolute;
+cursor: pointer;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background-color: #ccc;
+-webkit-transition: .4s;
+transition: .4s;
+}
+
+.slider:before {
+position: absolute;
+content: "";
+height: 20px;
+width: 20px;
+left: 5px;
+bottom: 3px;
+background-color: white;
+-webkit-transition: .4s;
+transition: .4s;
+}
+
+input:checked + .slider {
+background-color: #52B5E5;
+}
+
+input:focus + .slider {
+box-shadow: 0 0 1px #52B5E5;
+}
+
+input:checked + .slider:before {
+-webkit-transform: translateX(30px);
+-ms-transform: translateX(30px);
+transform: translateX(30px);
+}
+
+/* Rounded sliders */
+.slider.round {
+border-radius: 34px;
+}
+
+.slider.round:before {
+border-radius: 50%;
+}
+
+.input_msg{
+    padding: 5px 15px;
+    margin-left: 20px;
+    border: 2px solid;
+    border-color: #1D2769;
+    border-top: 2px solid #52B5E5;
+}
+
+.submit{
+    width: 60px;
+    background-color: white;
+    border: 2px solid;
+    border-color: #1D2769;
+    border-top: 2px solid #52B5E5;
+    padding: 5px 15px;
+}
+.submit:hover{
+    background-color: #1D2769;
+    color: white;
+}
 .graphique{
     display: flow-root;
 }
@@ -158,4 +183,5 @@ a{
     font-family: 'agilia';
     font-size: 24px;
     margin-top: 60px;
+    color: #1D2769;
 }
