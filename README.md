@@ -158,6 +158,7 @@ Nous pourrons appeler d'autre méthodes dans le `loop()`, ces méthodes seront e
 Les programmes Arduino peuvent en gérénal est réprésenté sous la forme de diagramme d'état, en voici un exemple :
 
 ![automate](img/mermaid_automate-removebg-preview.png)
+
 *Ici, nous avons 2 méthodes appelés dans le setup(), et 3 méthodes dans le loop().*
 
 - **Notre implémentation :**
