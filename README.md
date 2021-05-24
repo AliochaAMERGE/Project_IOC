@@ -528,7 +528,7 @@ Les nouvelles entités sont créer à la réception d'un message du broker, et s
   - Opérations supplémentaires plus facilement implémentable (Par exemple nous voulons la moyenne des valeurs de la photorésistance entre 9h et 19h en semaine, nous pourrons le faire avec une requête SQL les données étant deja en place)
   - administration de ces données facilitée grâce au framework Django : accès via `localhost:8000/admin`
 
-<img src="img/DjangoAdmin.png" alt="DjangoAdmin" width="400"/>
+<img src="img/DjangoAdmin.png" alt="DjangoAdmin" width="600"/>
 
 *Présentation de la page d'administration du serveur Django, Datas étant notre table.*
 
