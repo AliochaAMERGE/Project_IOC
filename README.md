@@ -670,7 +670,6 @@ Nous utiliserons un [formulaire HTML](https://docs.djangoproject.com/fr/2.2/topi
 
 ![](img/CommandeExample.png)
 
-
 Cette commande affichera ce super message sur notre écran :
 
 <img src="img/OledExample.jpg" width=400/>
