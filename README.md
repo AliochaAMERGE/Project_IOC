@@ -528,20 +528,161 @@ Les nouvelles entités sont créer à la réception d'un message du broker, et s
   - Opérations supplémentaires plus facilement implémentable (Par exemple nous voulons la moyenne des valeurs de la photorésistance entre 9h et 19h en semaine, nous pourrons le faire avec une requête SQL les données étant deja en place)
   - administration de ces données facilitée grâce au framework Django : accès via `localhost:8000/admin`
 
+<img src="img/DjangoAdmin.png" alt="DjangoAdmin" width="400"/>
+
+*Présentation de la page d'administration du serveur Django, Datas étant notre table.*
+
+- Inconvénients :
+  - La table ne se vide pas automatiquement, mais cela peut etre implémenter si nous avons des données plus conséquentes. Cela peut etre problématique si le serveur est lancé en permanence, il créé une nouvelle entité toutes les seconds.
+
+Nous verrons maintenant comment cette base de données est remplie.
 
 ## connection entre la base de donnée et l'esp via le broker
 
-quel méthodes, et ou sont elles appelée -> pourquoi dans init
+Nous avons maintenant le coeur de notre site opérationnel, il nous faut maintenant récupérer les données de notre broker MQTT, et les ajouter dans la base de donnée. Pour celà nous utiliserons la librarie python [*paho-mqtt*](https://pypi.org/project/paho-mqtt/).
+Nous devons donc d'abord installer la libraire :
+`pip install paho-mqtt`
 
-pourquoi avons nous ajouter les données direct dans la bdd, et pas au niveau des messages --> fait dans bdd
+Puis l'ajouter dans la liste des *requierements*.
 
-NB : on a du mqtt c++ python et js
+### esp32/output
 
-limite : 
-ATTENTION, erreur si reception d'un message non composé de nombre
-partie js non fonctionnelle car connection refusée, expliquer pourquoi (connection anonyme, acces depuis client et non serveur)
+Nous voulons lancer la connection au démarrage du serveur, la reception des messages se faisant dans la *back end*. C'est à ce moment que [/myapp/\_\_init__.py](website/myapp/__init__.py) fait sont entrée.
+
+Les méthodes appelés dans *\_\_init__* sont lancée au démarrage du serveur, et ce quoi qu'il arrive.
+
+Nous avons d'abord créé un fichier [myapp/output.py](website/myapp/output.py) pour gérer les données entrante sur le serveur (c'est à dire sortante de l'esp32 sur le topic *esp32/output*).
+
+```py
+# after conenecting to the MQTT broker
+def on_connect(client, userdata, flags, rc):
+    from .models import Data  # fix Apps aren't loaded yet
+
+    client.subscribe(topic="esp32/output")
+
+# upon message receipt
+def on_message(client, userdata, msg):
+    # fix Apps aren't loaded yet
+    from .models import Data 
+    # decode the message in order to use it (byte array -> String(utf-8))
+    temp = msg.payload.decode("utf-8")
+    # create a new entity in the table Data
+    Data.objects.create(id_esp="esp-test", value=float(msg.payload.decode("utf-8")))
+
+# create a new MQTT client
+client = mqtt.Client()
+# execute on_connect when connected
+client.on_connect = on_connect
+# execute on_message when receiving a message
+client.on_message = on_message
+
+# inititate connection
+client.connect("192.168.1.46", 1883)
+
+```
+
+Lors de la connection au broker, nous nous abonnons au topic `esp32/output` pour recevoir les données de l'esp32.
+
+Lors de la réception d'un message, nous créons une nouvelle entité dans notre table avec la valeurs récupérée du message. L'identifiant de l'esp32 est entré "*en dur*" pour le moment, mais nous pouvons utilisé le champs *userdata* pour avoir un identifiant plus cohérent.
+
+L'adresse du broker est également entrée "*en dur*", il serait fortement envisageable de la paramétrée au lancement du serveur Django via des arguments, ou une lecture de fichier.
+
+Dans le fichier [/myapp/\_\_init__.py](website/myapp/__init__.py), nous appelons `mqtt_output.client.loop_start()` afin de lancer la boucle d'attente des messages.
+
+Nous noterons la grande similarité des méthodes entre le code sur l'esp32 et celui ci : on_message <-> callback; mqtt_output.client.loop_start() <-> client.loop() etc ...
+
+Notre base de donnée se rempli au fur et à mesure de la réception des messages.
+
+- Limites de notre implémentation :
+
+Si un message arrive sur le topic `esp32/output` contenant autre chose qu'un entier, une erreur de conversion sera lancée.
+
+### esp32/input
+
+Nous voulons à présent envoyer des données depuis le site web vers l'esp32, pour cela nous utiliserons le topic `esp32/input`.
+
+Nous utiliserons à nouveau la librairie paho-mqtt, mais cette fois-ci en javascript : 
+
+```js
+jQuery(document).ready(function($) {
+  var client;
+  // broker ip adress
+  var host = "162.168.1.46";
+  // broker port
+  var port = 1883;
+
+  // after conenecting to the MQTT broker
+  function onConnect(){
+      console.log("Connected");
+      // set topic
+      message.destinationName = "esp32/input";
+      // first turn off the led
+      client.send("LedOff");
+  }
+  // inititate connection
+  function MQTTconnect(){
+      console.log("connecting to "+host + " "+ port);
+      // new connection
+      client = new Paho.MQTT.Client(host,port,"clientJS");
+      var option = {
+          timeout: 3,
+          onSuccess: onConnect,
+      };
+      // connect
+      client.connect(option);
+  }
+
+  MQTTconnect();
+
+  // react to the button, has been changed to a form
+  $('#switchLed').click(function() {
+      if($('#switchLed').is(':checked')){
+          // if switch is on, turn on the led 
+          document.getElementById('actualLed_val').innerHTML = 'On';
+          client.send("LedOn");
+      }else{
+          // if switch is off, turn off the led
+          document.getElementById('actualLed_val').innerHTML = 'Off';
+          client.send("LedOff");
+      }
+  });
+});
+```
+Nous remarquons qu'une fois de plus les méthodes sont similaire aux précédentes implémentations.
+Malheuresement cette implémentation ne fonctionnait pas, les connections au broker MQTT étaient refusée et nous n'avons pas réussi à résoudre le problème.
+
+Nous avons donc décidé d'implémenter l'envoie de commande à la réception d'une requete "*POST*".
+Nous avons un entrelacement du *front end* provenant du fichier HTML, avec le *back end* gérer par le serveur Django.
+Nous utiliserons un [formulaire HTML](https://docs.djangoproject.com/fr/2.2/topics/forms/).
+
+Nous verrons son implémentation dans la partie HTML plus tard, grossièrement, lorsque l'utilisateur entre des données dans le formulaire, une requete "*POST*" est envoyée, cette dernières est récupérée dans [/myappp/views.py](website/myapp/views.py) :
+
+```py
+def index(request):
+  # si une donnée est entrée dans le formulaire  
+  if request.method == 'POST' and 'esp32_input' in request.POST:
+      # etablie une connection temporaire et publie le contenu de la requete dessus
+      publish.single("esp32/input", request.POST.get("esp32_input"), hostname="192.168.1.46")
+  # charge le template
+  template = loader.get_template("index.html")
+  # récupère la derniere valeurs de la base de donnée
+  data = Data.objects.order_by("-pub_date").all()[0]
+  # affiche le rendu
+  return render(request, "index.html", {f"value": data.value})
+```
+
+Nous n'avons pas besoin de maintenir une connection constante avec le broker car les envoies de commandes seront isolées, nous publions sur le topic `esp32/input` la commande entrée par l'utilisateur, et nous déconnectons proprement.
+
+- Inconvénients :
+  - Lors d'un envoie de commande, un nouveau rendu de la page est réalisé ce qui provoque une *actualisation*.
+  - Si nous avons plusieurs esp32 sur la meme route, nous aurons besoin d'indiqué l'identifiant de l'esp concerné par la commande, ou d'utilisé plusieurs routes.
+
+- Idée de fonctionnalité :
+  - Ajouter une table supplémentaire contenant l'historique des commandes.
 
 ## partie java script et frontend
+
+Récupération des données de la BDD et création de la route /data en json
 
 views python
 html

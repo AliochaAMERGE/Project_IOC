@@ -58,7 +58,7 @@ void connectMQTT(void) {
     for (;;)
       ;  // Don't proceed, loop forever
   }
-  display.setTextSize(2);  // Draw 2X-scale text
+  display.setTextSize(1);  // Draw 1 X-scale text
   display.setTextColor(SSD1306_WHITE);
   display.clearDisplay();
   // Show initial display buffer contents on the screen --
@@ -92,7 +92,7 @@ void callback(char* topic, byte* message, unsigned int length) {
     } else {
       // on affiche le contenu du message sur l'écran Oled
       display.clearDisplay();        // efface le display
-      display.setCursor(20, 10);     // place le curseur
+      display.setCursor(0, 0);     // place le curseur
       display.println(messageTemp);  // écrit le message dans le buffer
       display.display();             // affiche le contenu du buffer
     }

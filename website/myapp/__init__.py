@@ -1,4 +1,3 @@
-from . import mqtt_input
+from . import mqtt_output
 
-mqtt_input.client.loop_start()
-    
+mqtt_output.client.loop_start()
