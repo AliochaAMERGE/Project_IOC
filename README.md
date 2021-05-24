@@ -682,6 +682,32 @@ Nous n'avons pas besoin de maintenir une connection constante avec le broker car
 
 ## partie java script et frontend
 
+Nous attaquons maintenant la partie visible de l'iceberg qu'est notre projet. Le *front end*.
+
+Nous n'utiliserons qu'une route, et un unique fichier HTML. Toutes les autres routes seront des *utilitaires*.
+
+### HTML
+
+Ce fichier contiendra l'ensemble des données affichée sur notre page Web tel que vous pouvez la voir.
+Ces données sont séparée en plusieurs sections :
+
+#### Le titre et les imports
+
+#### Le sommaire
+
+#### La valeurs de la photorésistance
+
+#### La valeurs de la Led
+
+### views
+
+### /data
+
+### Live data
+
+
+
+
 Récupération des données de la BDD et création de la route /data en json
 
 views python
