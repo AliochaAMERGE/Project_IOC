@@ -498,7 +498,7 @@ Si nous lançons le serveur, à l'adresse `localhost:8000`, le contenu de `index
 
 La base de notre serveur est en place.
 
-## création de la base de donnée
+## Implémentation d'une base de donnée
 
 pourquoi la bd
 format d'une table
