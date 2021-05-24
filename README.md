@@ -157,24 +157,7 @@ Nous pourrons appeler d'autre méthodes dans le `loop()`, ces méthodes seront e
 
 Les programmes Arduino peuvent en gérénal est réprésenté sous la forme de diagramme d'état, en voici un exemple :
 
-<body>
-  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
-</body>
-<body>
-  Here is a mermaid diagram:
-  <div class="mermaid">
-    graph LR
-    START ==> setup1
-    subgraph setup
-    setup1 --> setup2 
-    end
-    setup2 ==> loop1
-    subgraph loop
-    loop1 --> loop2 --> loop3 --> loop1
-    end
-  </div>
-</body>
-
+![automate](img/mermaid_automate-removebg-preview.png)
 *Ici, nous avons 2 méthodes appelés dans le setup(), et 3 méthodes dans le loop().*
 
 - **Notre implémentation :**
