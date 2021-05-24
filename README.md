@@ -156,17 +156,25 @@ Le code sera effectué périodiquement, c'est en quelque sorte un `while(true)`.
 Nous pourrons appeler d'autre méthodes dans le `loop()`, ces méthodes seront exécutée séquentiellement jusqu'à arrêt du programme.
 
 Les programmes Arduino peuvent en gérénal est réprésenté sous la forme de diagramme d'état, en voici un exemple :
-```mermaid
-graph LR
-  START ==> setup1
-  subgraph setup
-  setup1 --> setup2 
-  end
-  setup2 ==> loop1
-  subgraph loop
-  loop1 --> loop2 --> loop3 --> loop1
-  end
-```
+
+<body>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+</body>
+<body>
+  Here is a mermaid diagram:
+  <div class="mermaid">
+    graph LR
+    START ==> setup1
+    subgraph setup
+    setup1 --> setup2 
+    end
+    setup2 ==> loop1
+    subgraph loop
+    loop1 --> loop2 --> loop3 --> loop1
+    end
+  </div>
+</body>
+
 *Ici, nous avons 2 méthodes appelés dans le setup(), et 3 méthodes dans le loop().*
 
 - **Notre implémentation :**
@@ -500,7 +508,10 @@ La base de notre serveur est en place.
 
 ## Implémentation d'une base de donnée
 
-pourquoi la bd
+Notre prochaine étape consiste à mettre en place une base de donnée dans le serveur Django.
+Cette base de donnée permettra de garder en mémoire les données reçu du broker MQTT
+
+pourquoi la bdd
 format d'une table
 a quel moment on creer la table
 ou la bdd est utilisées (ajout et utilisation des données)
