@@ -2,6 +2,7 @@ from django.db import models
 
 
 class Data(models.Model):
+    # Identifiant générer implicitement
     # identifiant propre à l'esp (en cas de connection de plusieurs esp)
     id_esp = models.CharField(max_length=200)
     # date de la donnée

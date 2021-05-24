@@ -159,7 +159,7 @@ Les programmes Arduino peuvent en gérénal est réprésenté sous la forme de d
 
 ![automate](img/mermaid_automate-removebg-preview.png)
 
-*Ici, nous avons 2 méthodes appelés dans le setup(), et 3 méthodes dans le loop().*
+*Ici, nous avons 2 méthodes appelées dans le setup(), et 3 méthodes dans le loop().*
 
 - **Notre implémentation :**
 
@@ -436,7 +436,7 @@ Nous avons l'arborescence de notre site :
     ├── dev.txt
     └── prod.txt
 ```
-Des étapes sont nécessaire pour ajouter nos applications nouvellement crée au serveur Django, elles sont très bien expliquée sur le [vidéo suivante](https://www.youtube.com/watch?v=PqeAvFf_HDI) : 
+Des étapes sont nécessaire pour ajouter nos applications nouvellement crée au serveur Django, elles sont très bien expliquée sur la [vidéo suivante](https://www.youtube.com/watch?v=PqeAvFf_HDI) : 
 
 - Arborescence détaillée du serveur Django :
 ```
@@ -493,13 +493,40 @@ La base de notre serveur est en place.
 ## Implémentation d'une base de donnée
 
 Notre prochaine étape consiste à mettre en place une base de donnée dans le serveur Django.
-Cette base de donnée permettra de garder en mémoire les données reçu du broker MQTT
+Cette base de donnée permettra de garder en mémoire les données reçu du broker MQTT, et ce même après avoir éteint le serveur.
+De plus lors de la réception d'un message du broker MQTT, la donnée sera directement ajoutée dans la base de donnée. Et ensuite des requêtes vers cette base de donnée seront effectuée pour récupérer des valeurs et les affichées sur le site, mais nous verrons cela plus tard.
 
-pourquoi la bdd
-format d'une table
-a quel moment on creer la table
-ou la bdd est utilisées (ajout et utilisation des données)
-limite (les données n'expire pas)
+Notre base de donnée contient une unique table contenant les attributs suivant : 
+- Un identifiant unique s'incrémentant à chaque nouvelle entité.
+- Une chaine de caractère *id_esp* symbolisant l'identifiant de l'esp d'où provient la valeurs
+    (ne travaillant avec un unique esp, nous l'avons identifié par esp-test, mais nous pourrons récupérer l'identifiant via le broker à terme)
+- Une date de publication *pub_date* si nous voulons réaliser une requête sur une interval de date, mais ce type de requête n'est pas encore implémenter
+- Un entier symbolisant la valeurs de la photorésistance 
+
+Cette table a été défini dans le fichier [*/myapp/models.py*](website/myapp/models.py) de la manière suivante :
+
+```py
+class Data(models.Model):
+    # Identifiant générer implicitement
+    # identifiant propre à l'esp (en cas de connection de plusieurs esp)
+    id_esp = models.CharField(max_length=200)
+    # date de la donnée
+    pub_date = models.DateTimeField(auto_now_add=True)
+    # valeurs de la donnée (0,4000)
+    value = models.IntegerField()
+```
+
+Cette table s'appelle `Data` et étend `django.db.Model`. Les identifiants sont générer implicitement de manière unique, et les dates sont indiquées lors de la création d'une nouvelle entité dans la table.
+
+Nous avons besoin de migré la table après création comme indiqué dans la [vidéo suivante](https://www.youtube.com/watch?v=PqeAvFf_HDI) précédement utilisée.
+
+Les nouvelles entités sont créer à la réception d'un message du broker, et sont utilisée lors de l'affichage de la page HTML, ces deux aspects seront explicités ultérieurement.
+
+- Avantages :
+  - pérsistance des données
+  - accès faciliter au travers de requetes ([queries](https://docs.djangoproject.com/fr/3.2/topics/db/queries/))
+  - Opérations supplémentaires plus facilement implémentable (Par exemple nous voulons la moyenne des valeurs de la photorésistance entre 9h et 19h en semaine, nous pourrons le faire avec une requête SQL les données étant deja en place)
+  - administration de ces données facilitée grâce au framework Django : accès via `localhost:8000/admin`
 
 
 ## connection entre la base de donnée et l'esp via le broker
