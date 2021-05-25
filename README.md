@@ -43,8 +43,9 @@ Ce projet a été réalisé dans le cadre de l'UE IOC (MU4IN109) du master 1 Inf
   - [connection entre la base de donnée et l'esp32 via le broker MQTT](#connection-entre-la-base-de-donnée-et-lesp32-via-le-broker-mqtt)
     - [esp32/output](#esp32output-1)
     - [esp32/input](#esp32input-1)
-  - [Javascript et frontend](#javascript-et-frontend)
-    - [HTML](#html)
+  - [Frontend](#frontend)
+    - [HTML et CSS](#html-et-css)
+    - [Recupération des valeur](#recupération-des-valeur)
       - [Passage d'une valeurs en paramètre du rendu](#passage-dune-valeurs-en-paramètre-du-rendu)
       - [Passage d'une valeurs via une route dédiée](#passage-dune-valeurs-via-une-route-dédiée)
     - [Live data](#live-data)
@@ -806,6 +807,14 @@ Les différentes parties concernent :
 var element = document.getElementById("current_value")
 ```
 Ici nous stockons dans la variable `element` la valeur pointer par l'id `current_value` ce qui nous permettra par la suite de la modifier dynamiquement dans la partie Graphique.
+
+<img src="img/partie1.png" width=400/>
+<br/>
+<img src="img/LiveDataIOC.gif" width=400/>
+<br/>
+<img src="img/partie2.png" width=400/>
+
+*Représentaton de notre page web*.
 
 ### Recupération des valeur
 
