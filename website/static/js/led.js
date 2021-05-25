@@ -1,7 +1,7 @@
 jQuery(document).ready(function($) {
     var client;
     var reconnectTimeout = 2000;
-    var host = "162.168.1.46";
+    var host = "192.168.0.15";
     var port = 1883;
 
     function onConnect(){

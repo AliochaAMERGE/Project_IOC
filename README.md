@@ -62,7 +62,21 @@ Pour tester ce projet chez vous, vous aurez besoin de :
   - Une connection WiFi fonctionnelle (5 GHz non supporté)
   - Un raspberrypi (ou un pc / serveur) pouvant héberger le serveur et le broker MQTT
 
+- Modification nécéssaire :
+
+- Création d'un fichier : `esp32/include/WiFiCredentials.h`
+  ```cpp
+    const char *SSID = "xxxxxxx";
+    const char *WiFiPassword = "xxxxxxxx";
+  ```
+- Création d'un fichier : `esp32/include/MQTTCredentials.h`
+  ```cpp
+    const char* mqtt_server = "xxx.xxx.x.xx";
+    const int mqtt_port = 1883;  // port par défaut
+  ```
+
 &emsp;Pour lancer le serveur : 
+
 - Dans le dossier [website](website/), exécuter la commande `./manage.py runserver --noreload`. Le serveur se lancera sur l'adresse `localhost:8000`.
 Dans une optique de test, il est possible d'ajouter des données manuellement à la base de donnée via la route "/admin".
 Attention à ne pas laisser le serveur et l'esp32 connecté trop longtemps, la base de donnée pourrait atteindre une taille indésirée.
@@ -757,15 +771,43 @@ def index(request):
   - Ajouter une table supplémentaire contenant l'historique des commandes.
   - Ajouter un champs permettant de choisir vers quel ESP32 nous voulons envoyé la commande
 
-## Javascript et frontend
+## Frontend
 
 Nous attaquons maintenant la partie visible de l'iceberg qu'est notre projet. Le *front end*.
 
 Nous n'utiliserons qu'une route, et un unique fichier HTML. Toutes les autres routes seront des *utilitaires*.
 
-### HTML
+### HTML et CSS
 
+Fichier : [*index.html*](website/myapp/templates/index.html)
 Ce fichier contiendra l'ensemble des données affichée sur notre page Web tel que vous pouvez la voir.
+
+Pour cela nous avons utilisé principalement deux langages qui sont évidemment nul autres que HTML, CSS ainsi que JavaScript
+
+La découverte de la partie front-end à été aussi intérressante qu'enrichissante.
+
+<img align="right" width="300" height="340" src="/img/front_design.png" alt="front_design">
+
+Nous avons découper le code en plusieurs section "div" selon les différentes partie du site.
+
+Les différentes parties concernent :
+- Le header (*haut de page*) avec le titre et les logos
+- Des sections :
+  - Le sommaire 
+  - La valeur actuelle de la photoresistance
+  - Un formulaire d'envoie de message (*commande*)
+  - Un graphique dynamique
+- Le Footer (*bas de page*)
+
+&emsp;L'utilisation d'ID à été utile afin de retrouver certaines valeurs lors de l'implémentation du javascript dans le but d'afficher la valeur de la photoresistance par exemple :
+```js
+var element = document.getElementById("current_value")
+```
+Ici nous stockons dans la variable `element` la valeur pointer par l'id `current_value` ce qui nous permettra par la suite de la modifier dynamiquement dans la partie Graphique.
+
+### Recupération des valeur
+
+Nous affichons différentes valeurs dans la page HTML, ces valeurs proviennent de la base de donnée et sont soumises à des changements, nous devons donc nous assurer qu'elles restent autant que possible à jours. Nous avons utilisé deux méthodes afin de récupérer les valeurs de la base de donnée :
 
 #### Passage d'une valeurs en paramètre du rendu
 
@@ -775,7 +817,7 @@ Tout d'abord nous affichons les dernières valeurs de la photorésistance sur le
 
 Cette valeurs la dernière valeurs en date de la base de donnée. Au lancement du site elle est récupérée et passé en paramètre lors du rendu. 
 
-Fichier [*myapp/views.py](website/myapp/views.py) :
+Fichier [myapp/views.py](website/myapp/views.py) :
 ```py
 def index(request):
   # si requete POST provenant du formulaire
@@ -929,5 +971,5 @@ Rendre l'esp32 plus portatif en ajoutant une connection via Bluetooth pour ne pa
 
 Nous sommes vraiment à la fin de ce rapport cette fois-ci.
 
-Nous tenions particulièrement à remercier Monnsieur Franck Wajsburt pour cette UE.
-Malgré les conditions particulière vous nous avez proposer des cours, des TP et un projet passionnant. Nous avons pris un réel plaisir à faire ce projet, et nous espérons que nous avons réussi à vous le monter au travers de ce projet, et que ce dernier n'a pas été trop long à lire.
+Nous tenions particulièrement à remercier Monsieur Franck Wajsburt pour cette UE.
+Malgré les conditions particulière vous nous avez proposer des cours, des TP et un projet passionnant. Le nombre de choses retenu est juste incroyable et ont été vraiment enrichissante. Nous avons pris un réel plaisir à faire ce projet, et nous espérons que nous avons réussi à vous le montrer au travers de ce projet, et que ce dernier n'a pas été trop long à lire.

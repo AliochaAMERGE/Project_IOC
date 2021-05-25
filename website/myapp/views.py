@@ -13,7 +13,7 @@ def index(request):
     # si requete POST provenant du formulaire
     if request.method == 'POST' and 'esp32_input' in request.POST:
         # publication de la commande
-        publish.single("esp32/input", request.POST.get("esp32_input"), hostname="192.168.1.46")
+        publish.single("esp32/input", request.POST.get("esp32_input"), hostname="192.168.0.15")
     template = loader.get_template("index.html")
     # nous récupérons la dernière valeurs de la base de donnée.
     data = Data.objects.order_by("-pub_date").all()[0]

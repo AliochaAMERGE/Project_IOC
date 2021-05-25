@@ -28,5 +28,5 @@ client.on_connect = on_connect
 client.on_message = on_message
 
 # inititae connection
-client.connect("192.168.1.46", 1883)
+client.connect("192.168.0.15", 1883)
 print("connected to mqtt server", file=sys.stderr)
