@@ -1,5 +1,5 @@
-  <img align ="right" height="80" width="200"  src="/img/Sciences_SU.png">
-  <img  align="left" height="80" width="200" src="/img/peri.png">
+  <img align ="left" height="80" width="200"  src="/img/Sciences_SU-removebg-preview.png">
+  <img  align="right" height="80" width="200" src="/img/peri.png">
 
 <center> <h1>IOC [MU4IN109] - Micro projet</h1> </center>
 
@@ -61,7 +61,7 @@ Pour tester ce projet chez vous, vous aurez besoin de :
   - Une connection WiFi fonctionnelle
   - Un raspberrypi (ou un pc / serveur)
 
-Pour lancer le serveur, allez dans le dossier [website](website/) et exécutez la commande `./manage.py runserver --noreload`.
+&emsp;Pour lancer le serveur, allez dans le dossier [website](website/) et exécutez la commande `./manage.py runserver --noreload`.
 Dans une optique de test, vous pouvez ajouter des données manuellement à la base de donnée via la route "/admin".
 Attention à ne pas laisser le serveur et l'esp32 connecté trop longtemps, la base de donnée pourrait atteindre une taille indésirée.
 
