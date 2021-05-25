@@ -8,7 +8,6 @@ import paho.mqtt.publish as publish
 
 from .models import Data
 
-
 def index(request):
     # si requete POST provenant du formulaire
     if request.method == 'POST' and 'esp32_input' in request.POST:

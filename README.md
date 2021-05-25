@@ -75,6 +75,8 @@ Pour tester ce projet chez vous, vous aurez besoin de :
     const int mqtt_port = 1883;  // port par défaut
   ```
 
+- Modification des fichers [*website/myapp/mqtt_output.py*](website/myapp/mqtt_output.py) et [*website/myapp/views.py*](website/myapp/views.py) en modifiant les valeurs de `mqtt_server` et `mqtt_port`.
+
 &emsp;Pour lancer le serveur : 
 
 - Dans le dossier [website](website/), exécuter la commande `./manage.py runserver --noreload`. Le serveur se lancera sur l'adresse `localhost:8000`.
