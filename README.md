@@ -5,27 +5,28 @@
 
 Réalisé par :
 
-- **Haitham OUERSIGHNI M1 SAR**
-- **Aliocha AMERGÉ M1 SAR**
+- **Haitham &emsp; OUERSIGHNI &emsp; M1 SAR**
+- **Aliocha&emsp;&emsp;AMERGÉ &emsp;&emsp;&emsp; M1 SAR**
 
-Lien du projet : https://github.com/AliochaAMERGE/Project_IOC
+Lien du projet : *https://github.com/AliochaAMERGE/Project_IOC*
 
-Ce projet a été réalisé dans le cadre de l'UE IOC (MU4IN109) du master 1 Informatique mention SAR de *Sorbonne Université*.
+Ce projet a été réalisé dans le cadre de l'UE IOC (MU4IN109) du master 1 Informatique mention SAR de *Sorbonne Université* sous la direction de Monsieur Franck Wajsburt.
 
 <div style="page-break-after: always;"></div>
 
 # Table of contents
 
 - [Table of contents](#table-of-contents)
+    - [Instructions concernant ce projet :](#instructions-concernant-ce-projet-)
 - [Introduction et format du projet](#introduction-et-format-du-projet)
   - [Les consignes :](#les-consignes-)
-  - [Nos objectifs :](#nos-objectifs-)
   - [Matériel utilisé :](#matériel-utilisé-)
-- [Mise en place du broker](#mise-en-place-du-broker)
+- [Mise en place du broker MQTT](#mise-en-place-du-broker-mqtt)
   - [Qu'est ce qu'un broker MQTT ?](#quest-ce-quun-broker-mqtt-)
-  - [Installation du broker MQTT sur la raspberry](#installation-du-broker-mqtt-sur-la-raspberry)
+  - [Installation du broker MQTT sur le raspberrypi](#installation-du-broker-mqtt-sur-le-raspberrypi)
 - [ESP32](#esp32)
   - [Déroulement de l'algorithme](#déroulement-de-lalgorithme)
+    - [**Notre implémentation :**](#notre-implémentation-)
   - [Connection au broker MQTT](#connection-au-broker-mqtt)
     - [Connection WiFi](#connection-wifi)
     - [Connection au broker MQTT](#connection-au-broker-mqtt-1)
@@ -35,11 +36,11 @@ Ce projet a été réalisé dans le cadre de l'UE IOC (MU4IN109) du master 1 Inf
   - [Résumé](#résumé)
 - [Website](#website)
   - [Objectifs](#objectifs)
-  - [Installation du serveur Django](#installation-du-serveur-django)
+  - [Implémentation du serveur Django](#implémentation-du-serveur-django)
     - [Pourquoi Django ?](#pourquoi-django-)
     - [Création du serveur Django](#création-du-serveur-django)
   - [Implémentation d'une base de donnée](#implémentation-dune-base-de-donnée)
-  - [connection entre la base de donnée et l'esp via le broker](#connection-entre-la-base-de-donnée-et-lesp-via-le-broker)
+  - [connection entre la base de donnée et l'esp32 via le broker MQTT](#connection-entre-la-base-de-donnée-et-lesp32-via-le-broker-mqtt)
     - [esp32/output](#esp32output-1)
     - [esp32/input](#esp32input-1)
   - [Javascript et frontend](#javascript-et-frontend)
@@ -52,21 +53,22 @@ Ce projet a été réalisé dans le cadre de l'UE IOC (MU4IN109) du master 1 Inf
 - [Remerciement](#remerciement)
 
 
-- Instruction concernant ce projet :
+### Instructions concernant ce projet :
 
 Pour tester ce projet chez vous, vous aurez besoin de :
   - Pyenv (installation détaillée dans le rapport)
-  - Un IDE d'IOT (PlatformIO, ArduinoIDE) + des libraires détaillée dans le rapport
-  - Un esp32
-  - Une connection WiFi fonctionnelle
-  - Un raspberrypi (ou un pc / serveur)
+  - Un IDE supportant la programmation Arduino (PlatformIO, ArduinoIDE) ainsi que certaines libraires (détaillées dans le rapport).
+  - Un ESP32 ou un Arduibno
+  - Une connection WiFi fonctionnelle (5 GHz non supporté)
+  - Un raspberrypi (ou un pc / serveur) pouvant héberger le serveur et le broker MQTT
 
-&emsp;Pour lancer le serveur, allez dans le dossier [website](website/) et exécutez la commande `./manage.py runserver --noreload`.
-Dans une optique de test, vous pouvez ajouter des données manuellement à la base de donnée via la route "/admin".
+&emsp;Pour lancer le serveur : 
+- Dans le dossier [website](website/), exécuter la commande `./manage.py runserver --noreload`. Le serveur se lancera sur l'adresse `localhost:8000`.
+Dans une optique de test, il est possible d'ajouter des données manuellement à la base de donnée via la route "/admin".
 Attention à ne pas laisser le serveur et l'esp32 connecté trop longtemps, la base de donnée pourrait atteindre une taille indésirée.
 
-Au cours de ce rapport, de nombreux lien hypertext sont présents, ainsi que des images et un formatage particulier.
-Pour plus de confort, il est *fortement* conseillé de lire ce rapport sur https://github.com/AliochaAMERGE/Project_IOC .
+&emsp;Au cours de ce rapport, de nombreux lien hypertexte sont présents, ainsi que des images et un formatage particulier.
+Pour plus de confort, il est *fortement* conseillé de lire ce rapport sur https://github.com/AliochaAMERGE/Project_IOC.
 
 Merci pour tout, et bon courage dans la lecture de ce rapport.
 
@@ -75,17 +77,9 @@ Merci pour tout, et bon courage dans la lecture de ce rapport.
 
 ## Les consignes :
 
-&emsp;Le micro-projet consiste à mettre en place un serveur HTTP sur une rasperrypi. 
-Ce serveur devra afficher des données envoyées par l'ESP32, et permettre d'envoyer des messages à afficher sur l'écran OLED de l'ESP32.
-Les données envoyées seront les valeurs de la photorésistance.
-
-## Nos objectifs :
-
-&emsp;Au cours de ce micro-projet, nous voulons faire communiquer un ESP32 avec un raspberrypi, et ce au travers d'un broker MQTT.
-L'objectif est donc de récupérer les valeurs de la photorésistance de l'ESP32, les envoyées au broker MQTT implémenter sur le raspberrypi,
-qui à son tour, transfère les données sur le site web implémenter également sur le raspberrypi.
-Nous voulons également récupérer des *commandes* (des messages) depuis un formulaire sur le site web, qui effectuerons diverses actions sur l'ESP32.
-
+&emsp;Ce micro-projet consiste à faire communiquer un ESP32 et un serveur HTTP au travers d'un broker MQTT.
+&emsp;Nous devons donc mettre place un serveur HTTP sur un rasperrypi. Ce serveur affichera des données envoyées depuis l'ESP32 et permettra à son tour d'envoyer des messages et d'autre commande à afficher sur l'écran OLED de l'ESP32.
+Les données envoyées par l'ESP32 seront les valeurs de la photorésistance.
 
 ## Matériel utilisé :
 
@@ -98,39 +92,41 @@ Nous voulons également récupérer des *commandes* (des messages) depuis un for
 
 - Un broker MQTT [Mosquitto](https://mosquitto.org/)
 
-# Mise en place du broker
+# Mise en place du broker MQTT
 
 ## Qu'est ce qu'un broker MQTT ?
 
 &emsp;MQTT (message Queuing Telemetry Transport) est un protocole de messagerie qui fonctionne sur le principe de souscription / publication. [[1]](https://projetsdiy.fr/mosquitto-broker-mqtt-raspberry-pi/)
-Concrêtement, le broker MQTT fait office d'intérmédiaire entre différents clients. Lorsque qu'un client s'**abonne** (subscribe) sur un **topic**, le broker lui transmettra tous les messages **publié** (publish) par d'autre client sur ce **même topic**. Les topics sont liés au broker, il n'y aura pas de conflit si nous utilisons deux fois le même topic sur deux brokers différents, ces deux topics seront distincts.
+Concrêtement, le broker MQTT fait office d'intérmédiaire entre différents clients. Lorsque qu'un client s'**abonne** (subscribe) sur un **topic**, le broker lui transmettra tous les messages **publiés** (publish) par d'autre clients sur ce **même topic**. Les topics sont liés au broker, il n'y aura pas de conflit si nous utilisons deux fois le même topic sur deux brokers différents, ces derniers seront distincts.
 
 ![MQTT-example](/img/MQTT.png)
-&emsp;*Fonctionnement d'un broker* : nous avons deux clients (4 et 5) abonnés sur deux topic */data/A* et */data/B* et trois clients (1, 2 et 3) publiant des messages sur les topics */data/A* et */data/b*. 
-Le broker transférerant tous les messages du client 1 et 3 aux client 4 et 5, et tous les messages des clients 2 et 3 au client 4.
 
-Dans ce micro-projet, le schéma sera le suivant : 
+&emsp;*Fonctionnement d'un broker* : nous avons deux clients (4 et 5) abonnés sur deux topic */data/A* et */data/B* et trois clients (1, 2 et 3) publiant des messages sur les topics */data/A* et */data/b*. 
+Le broker transfère tous les messages du client 1 et 3 aux client 4 et 5 (topic : */data/A*), et tous les messages des clients 2 et 3 au client 4 (topic */data/B*).
+
+Dans notre micro-projet, le schéma sera le suivant : 
 
 ![](/img/ourMQTT.png)
 
-&emsp;Le raspberry héberge le broker MQTT et le site web. L'ESP32 produit les données via sa photorésistance.
-Les données de la photorésistance sont envoyé au broker via le topic `esp32/output` (valeurs entre 0 et 4000).
-L'utilisateur à la possibilité d'effectuer différentes actions pré-configurée sur l'esp32 (allumer ou éteindre la LED, afficher un message sur l'écran OLED) directement depuis le site web. Nous utiliserons le topic `esp32.input`.
+&emsp;Le raspberrypi héberge le broker MQTT et le site web. L'ESP32 produit des données via sa photorésistance.
+Les données de la photorésistance sont envoyées au broker via le topic `esp32/output` (valeurs : entier entre 0 et 4000).
+L'utilisateur à la possibilité d'effectuer différentes actions pré-configurées sur l'ESP32 (allumer ou éteindre la LED, afficher un message sur l'écran OLED) directement depuis le site web. Nous utiliserons le topic `esp32/input`.
 
-## Installation du broker MQTT sur la raspberry
+## Installation du broker MQTT sur le raspberrypi
 
 &emsp;Nous utilisons un broker MQTT [Mosquitto](https://mosquitto.org/) intégré au raspberrypi.
 
-Source pour reproduire l'installation : 
+- *Source pour reproduire l'installation :*
+
 https://appcodelabs.com/introduction-to-iot-build-an-mqtt-server-using-raspberry-pi
 
-- 1. Installation de Broker MQTT Mosquitto
+- 1. Installation de Broker MQTT Mosquitto (sur Ubuntu / Débian)
 
 `sudo apt install mosquitto mosquitto-clients`
 
 - 2. Activation du broker mosquitto
     
-Active le broker et l'autorise à se lancer automatiquement après avoir redémarrer le raspberry
+Active le broker et l'autorise à se lancer automatiquement après avoir redémarrer le raspberrypi
 `sudo systemctl enable mosquitto`
 
 Si la connection est refusée lors d'un abonnement ou une publication, il peut être nécéssaire de redémarrer le démon mosquitto :
@@ -149,13 +145,17 @@ Sur le terminal 2, nous publierons "Hello World" sur le topic `test/message` :
 
 &emsp;Notre broker Mosquitto est opérationnel, mais pour le moment il n'est accessible que localement. Dans le cadre du projet, nous le laisserons tel quel, mais pour une utilisation plus poussée, il sera nécéssaire d'ouvrir les ports pour un accès depuis l'extérieur (par exemple si nous hébergons le site via un service de cloud distant)
 
-Notre serveur MQTT étant installé sur le raspberry, il nous faut récupérer l'adresse de ce dernier pour pouvoir y accéder (même localement il est nécéssaire de le différencier d'autre appareil).
-Pour ce faire nous récupérons l'adresse avec :
+&emsp;Notre broker MQTT étant installé sur le raspberry, il nous faut récupérer l'adresse de ce dernier pour pouvoir y accéder (même localement il est nécéssaire de le différencier d'autres appareils).
+
+- Pour ce faire nous récupérons l'adresse avec :
+
 `hostname -I`
-Si le broker est installé sur Windows, il faudra utilisé la commande : 
+
+- Si le broker est installé sur Windows, il faudra utilisé la commande : 
+
 `ipconfig`
 
-Cette adresse sera utile à tous moment lorsque nous voulons converser avec le broker MQTT.
+Cette adresse sera utile à tout moment lorsque nous voudrons converser avec le broker MQTT.
 
 
 # ESP32
@@ -185,25 +185,25 @@ Le code nécéssite deux méthodes : `void setup();` et `void loop();`
 
   - `void setup();`
 
-&emsp;Le code sera éffectué une fois au démarrage de l'esp32, il sert notamment à l'initiatlisation des variables, ou toutes actions que nous ne réalisons qu'une fois.
-Nous pouvons appeler d'autre méthodes dans le `setup()`, ces méthodes seront executée une unique fois.
+&emsp;La méthode sera appelée une fois au démarrage de l'esp32, elle sert notamment à l'initiatlisation des variables, à la connection à un réseau, ou toutes actions que nous ne réalisons qu'une fois.
+Nous pouvons appeler d'autre méthodes dans le `setup()`, ces méthodes ne seront executée qu'une unique fois.
 
   - `void loop();`
 
-&emsp;Le code sera effectué périodiquement, c'est en quelque sorte un `while(true)`. Nous réalisons les différentes actions de notre code dans cette méthode. 
+&emsp;La méthode sera appelée périodiquement, c'est en quelque sorte un `while(true){ loop() }`. Nous réalisons les différentes actions périodique de notre code dans cette méthode. 
 Nous pourrons appeler d'autre méthodes dans le `loop()`, ces méthodes seront exécutée séquentiellement jusqu'à arrêt du programme.
 
-Les programmes Arduino peuvent en gérénal est réprésenté sous la forme de diagramme d'état, en voici un exemple :
+Les programmes Arduino peuvent en gérénal être réprésenté sous la forme de diagramme d'état, en voici un exemple :
 
 ![automate](img/mermaid_automate-removebg-preview.png)
 
 *Ici, nous avons 2 méthodes appelées dans le setup(), et 3 méthodes dans le loop().*
 
-- **Notre implémentation :**
+### **Notre implémentation :**
 
 Fichier : [*esp32/src/main.cpp](esp32/src/main.cpp)
 
-**Les variables**
+- **Les variables**
 
 ```cpp
 // Le broker
@@ -213,17 +213,19 @@ PubSubClient client(espClient);
 Adafruit_SSD1306 display
 ```
 
-**setup()**
+- **setup()**
+
 ```cpp
 void setup(){
   // Connection au WiFi
   ConnectWifi();
   // Connection au broker MQTT & subscribe aux topics désirés
   ConnectMQTT();
-  // et c'est tout, les autres fonctionnalités sont gérée dans ConnectMQTT()
+  // et c'est tout, les autres fonctionnalités sont gérée dans ConnectMQTT().
 }
 ```
-**loop()**
+
+- **loop()**
 
 ```cpp
 void loop(){
@@ -259,12 +261,13 @@ void connectWifi(void) {
 ```
 
 Les identifiants (SSID) et mot de passe (WiFiPassword) seront indiqués dans le fichier */esp32/include/WiFiCredentials.h* contenant ces deux variables :
+
 ```cpp
 const char *SSID = "xxxxxxx";
 const char *WiFiPassword = "xxxxxxxx";
 ```
 
-**ATTENTION : Ce dernier devra être créé par l'utilisateur, et modifier en cas de changement de réseau WiFi**
+**ATTENTION : Le fichier */esp32/include/WiFiCredentials.h* devra être créé par l'utilisateur, et modifier en cas de changement de réseau WiFi !**
 
 ### Connection au broker MQTT
 
@@ -275,6 +278,8 @@ const char* mqtt_server = "xxx.xxx.x.xx";
 const int mqtt_port = 1883;  // port par défaut
 ```
 
+Fichier : [*esp32/include/MQTTConfig.h*](esp32/include/MQTTConfig.h)
+
 ```cpp
 // Connection au serveur 
 client.setServer(mqtt_server, mqtt_port);
@@ -283,6 +288,7 @@ client.setCallback(callback);
 // abonnnement au topic esp32/input
 client.subscribe("esp32/input")
 ```
+
 La méthode `setCallback()` prend en paramètre un pointeur sur fonction et indiquera la procédure à réaliser en cas de réception d'un message. Nous expliciterons cette méthode ultérieurement.
 
 La souscription sera également explicitée par la suite.
@@ -312,12 +318,13 @@ Nous relançons tout simplement la connection au serveur, ainsi que les abonneme
 
 A ce niveau, nous avons établis une connection au WiFi et au broker MQTT, mais nous ne recevons ni n'envoyons de données vers ce dernier, c'est ce que nous verrons par la suite.
 
-Nous mettons en place maintenant deux topics, un pour les messages entrants, et un pour les messages sortants.
+Nous mettons maintenant en place deux topics, un pour les messages *entrants*, et un pour les messages *sortants*.
 
 ## esp32/output
 
 Ce topic concerne les données *sortantes* de l'esp32 vers le site web, c'est à dire dans notre implémentation, les valeurs captée par la photorésistance.
-Cette valeurs lu toutes les secondes, puis envoyé au broker :
+Cette valeurs est lu toutes les secondes, puis envoyé au broker :
+
 ```cpp
 long now = millis();
 if (now - lastMsg > 1000) {
@@ -336,15 +343,17 @@ if (now - lastMsg > 1000) {
 &emsp;Nous verifions si le délai d'une seconde depuis le dernier envoie est atteint (d'une manière très similaire au waitFor() vu au cours du TME 3).
 Ensuite nous récupérons la valeurs de la photorésistance avec `analogRead(byte pin)`. Cette valeurs est comprise entre 0 et 4000 (du plus clair au plus sombre). Elle est ensuite convertie en une chaine de caractère, puis publiée sur le topic `esp32/ouput`.
 
+**NB** : Nous n'utilisons pas la fonction `delay(1000)` car cela provoque une attente bloquante ce qui empêche l'appel à d'autre méthodes ("met en pause le *loop()*").
+
 ## esp32/input
 
 &emsp;Ce topic concerne les données *entrantes* vers l'esp32 depuis le site web, ce sont des *commandes* depuis le site web.
 Pour le moment, nous avons 3 commandes mise en place :
-- LedOn : allume la Led
-- LedOff : éteint la Led
-- autre : affiche le contenu du message sur l'écran OLED
+- "LedOn" : allume la Led (*LEDBUILTIN*)
+- "LedOff" : éteint la Led (*LEDBUILTIN*)
+- un autre message : affiche le contenu du message sur l'écran OLED (le message à une taille maximale)
 
-Ces messages sont gérer dans la fonction `callback()` précedemment énoncé :
+Ces commandes sont gérées dans la fonction `callback()` précedemment énoncée :
 
 ```cpp
 void callback(char* topic, byte* message, unsigned int length) {
@@ -381,26 +390,29 @@ void callback(char* topic, byte* message, unsigned int length) {
 
 &emsp;Le code est plutot explicite, lors de la récetion d'un message, nous le convertissions en String, si le topic du message est `esp32/input`, nous le traitons.
 Cette verification est utile si nous nous abonnons à plusieurs topics (ce qui n'est pas le cas dans notre implémentation).
-Nous passons le mode du pin concernant la Led en OUTPUT afin de pouvoir écrire une valeurs (HIGH ou LOW), si nous recevons "LedOn" nous allumons la Led, et inversement si nous recevons "LedOff". Si nous recevons un autre message, ce dernier sera afficher sur l'écran (ne fonctionne que pour des messages relativement court pour le moment, mais cela est facilement modifiable en fonction des besoins).
-
-Pour utiliser l'écran, nous avons besoin de réaliser plusieurs opérations sur ce dernier au préalable qui sont expliqués dans le lien suivant : https://mansfield-devine.com/speculatrix/2019/01/ttgo-esp32-oled-display/
+Nous passons le mode du pin concernant la Led en OUTPUT afin de pouvoir écrire une valeurs (HIGH ou LOW), si nous recevons "LedOn" nous allumons la Led, et inversement si nous recevons "LedOff". 
+Si nous recevons un autre message, ce dernier sera afficher sur l'écran (ne fonctionne que pour des messages relativement court pour le moment, mais cela est facilement modifiable en fonction des besoins).
 
 <img src="img/OledExample.jpg" width=400/>
+
+Pour utiliser l'écran, nous avons besoin de réaliser plusieurs opérations sur ce dernier au préalable qui sont expliqués dans le lien suivant : 
+https://mansfield-devine.com/speculatrix/2019/01/ttgo-esp32-oled-display/
 
 ## Limites de l'implémentation
 
 - Problème : 
 
-&emsp;Cette implémentation montre tout de même quelques défauts. Tout d'abord, il est nécéssaire de rentrer les identifiants et mots de passe du WiFi et du broker *en dur* à chaque changement de réseau WiFi ou de broker. En cas de partage du code, ces données apparaissent en clair et ne sont pas criptées, ce qui peux provoquer un risque d'un point de vue sécurité.
+&emsp;Cette implémentation montre tout de même quelques défauts. Tout d'abord, il est nécéssaire de rentrer les identifiants et mots de passe du WiFi et du broker "*en dur*" à chaque changement de réseau WiFi ou de broker. En cas de partage du code, ces données apparaissent en clair et ne sont pas criptées, ce qui peux provoquer un risque d'un point de vue sécurité.
 
 - Idée de résolution :
 
-&emsp;Il faudrait chiffré les identifiants en utilisant une clé de chiffrement propre aux utilisateurs, mais cela demande d'implémenter un algorithme suplémentaire pour déchiffrer ces données, propre à chaque personne, ce qui ne rend pas le code plus facilement distribuable.
+&emsp;Résolution temporaire, nous demandons aux utilisateurs de créer le fichier contenant leurs identifiants, cela n'est viable que dans une phase de test.
+&emsp;Résolution plus performante : Il faudrait chiffré les identifiants en utilisant une clé de chiffrement propre aux utilisateurs, mais cela demande d'implémenter un algorithme suplémentaire pour déchiffrer ces données, propre à chaque personne, ce qui ne rend pas le code plus facilement distribuable.
 Nous pourrions également faire une demande d'argument à l'exécution, ce qui serait plus simple mais non persistant.
 
 - Problème :
 
-&emsp;Nous faisons face à des déconnection récurrente, et des retards dans les envoies / réceptions de messages en lien avec le broker.
+&emsp;Nous faisons face à des déconnections intempestives ainsi que des retards dans les envoies / réceptions de messages en lien avec le broker.
 
 - Idée de résolution :
 
@@ -409,14 +421,13 @@ Nous pourrions également faire une demande d'argument à l'exécution, ce qui s
 ## Résumé
 
 &emsp;L'implémentation sur l'esp32 est terminée.
-Nous avons connecté l'esp32 au WiFi et au broker MQTT.
-Nous avons créer deux topic, un pour les messages entrants (`esp32/input`), un pour les messages sortants(`esp32/ouput`).
+Nous avons connecté l'esp32 au WiFi et au broker MQTT ainsi que deux topic, un pour les messages entrants (`esp32/input`), un pour les messages sortants(`esp32/ouput`).
 &emsp;Le topic pour les messages sortants concerne les valeurs de la photorésistance, le topic concernant les messages entrants concerne des commandes traitées par l'esp32.
-Ces commandes sont  { "LedOn" : allume la Led, "LedOff" : éteint la Led, "autre" : affiche la commande sur l'écran.
+Ces commandes sont  { "LedOn" : allume la Led, "LedOff" : éteint la Led, autre : affiche la commande sur l'écran.
 
 # Website
 
-&emsp;Nous attaquons la partie le plus conséquente de ce micro-projet, et celle qui nous a demandé le plus de temps, et le plus de lecture de documentation. Nous n'expliciterons pas toutes les étapes de notre cheminemant afin de créer le site car la rapport serait bien trop long. Nous indiquerons donc dans la mesure du possible la doc / les tutoriels afin de reproduire les étapes, et nous prendrons au maximum appuie sur le code.
+&emsp;Nous attaquons la partie le plus conséquente de ce micro-projet, et celle qui nous a demandé le plus de temps, et le plus de lecture de documentation. Nous n'expliciterons pas toutes les étapes de notre cheminemant afin de créer le serveur Web car la rapport serait bien trop long (ce qui est déja le cas). Nous indiquerons donc dans la mesure du possible la documentation / les tutoriels utilisé afin de reproduire les étapes, et nous prendrons au maximum appuie sur le code.
 
 ## Objectifs
 
@@ -424,23 +435,25 @@ Ces commandes sont  { "LedOn" : allume la Led, "LedOff" : éteint la Led, "autre
 
 Pour ce faire nous avons décidé d'utiliser le [framework Django](https://www.djangoproject.com/)
 
-## Installation du serveur Django
+## Implémentation du serveur Django
+
+"*Django is a high-level Python Web framework that encourages rapid development and clean, pragmatic design. Built by experienced developers, it takes care of much of the hassle of Web development, so you can focus on writing your app without needing to reinvent the wheel. It’s free and open source.*" - djangoproject.com
 
 ### Pourquoi Django ?
 
 Nous avons choisis d'utiliser Django pour plusieurs raisons :
 
-- Framework reconnu et beaucoup utilisé : 
+- C'est un framework reconnu mondialement : 
 
-Apprendre à créer un serveur Django est beaucoup demandé, et nous sera toujours utilse d'un point de vue professionnel, et personnel si nous voulons complexifié notre serveur.
+Apprendre à utiliser un serveur Django est beaucoup demandé, et nous sera toujours utile d'un point de vue professionnel, et personnel si nous voulons complexifier notre serveur.
 
-- Performance : 
+- Disposant de hautes performances : 
 
 Nous faisions face à des soucis de performance et de forte utilisation des ressources matérielles lors de la mise en place d'un serveur HTTP *basics*. Ces problèmes n'ont pas été apperçu avec le serveur Django.
 
-- Faciliter d'impléméntation : 
+- Et d'une facilité d'impléméntation déconcertante : 
 
-Au début de ce projet, nous pensions que le site web serait un *support* et que le partie importante du code était sur l'esp32, nous nous étions lourdement trompé. Le framework étant implémenter en python, déstiné au *grand public*, et disposant d'une documentation riche (ainsi que d'une grande variété de ressources tierces en ligne), l'implémentation du serveur est très simple.
+Au début de ce projet, nous pensions que le site web serait un *support* et que le partie importante du code était sur l'esp32, nous nous étions lourdement trompé. Le framework étant implémenter en python, déstiné au *grand public*, et disposant d'une documentation riche (ainsi que d'une grande variété de ressources tierces en ligne), l'implémentation du serveur simplifiée au possible et extrémement versatile en fonction de nos besoins.
 
 "*Django : The web framework for perfectionists with deadlines.*"
 
@@ -450,7 +463,7 @@ La création du serveur Django se base grandement sur cette playlist youtube par
 
 - Mise en place d'un environnement virtuel python :
 
-*Pourquoi* ? Afin de faciliter les dépendances, les librairies, leurs versions, et la vesion de python.
+*Pourquoi* ? Afin de faciliter les dépendances, les librairies, leurs versions, et la version de python.
 Python 2 et python 3 n'étant pas retro-compatible, il est parfois nécessaire de forcer un environnement pour éviter tout problème de compatibilité.
 
 Pour créer un environnement virtuel, nous utiliserons [*pyenv*](https://github.com/pyenv/pyenv) ([lien pour l'installation sous Ubuntu](https://www.liquidweb.com/kb/how-to-install-pyenv-on-ubuntu-18-04/)) suivi de [*pyenv virtualenv*](https://github.com/pyenv/pyenv-virtualenv) ([lien pour l'installation sous Ubuntu](https://www.liquidweb.com/kb/how-to-install-pyenv-virtualenv-on-ubuntu-18-04/)).
@@ -461,12 +474,12 @@ Nous ajouterons également un dossier `/requierements/` contenant deux fichiers 
 
 - Mise en place du serveur Django
 
-Nous installerons ensuite la librairie Django avec `pip install Django`. Dependance que nous ajouterons à `prod.txt`.
+Nous installons ensuite la librairie Django avec `pip install Django`. Sans oublier d'ajouter la nouvelle dépendance à `prod.txt`.
 
-&emsp;Nous créons ensuite un projet Django avec la commande `django-admin startproject pioc_website` ce sera notre site web. Au sein de ce site, nous créons une application que sera propre à ce projet, nous l'avons appeler *myapp* (le non aurai pu être mieux choisis) `./manage.py startapp myapp`. 
+&emsp;Nous créons ensuite un projet Django avec la commande `django-admin startproject pioc_website` ce sera notre site web. Au sein de ce site, nous créons une application que sera propre à ce projet, nous l'avons appeler *myapp* (le nom aurai pu être mieux choisis) `./manage.py startapp myapp`. 
 &emsp;Nous migrons ensuite l'application que nous venons de créer : `./manage.py migrate`. Les migrations sont la manière par laquelle Django propage des modifications que nous apportons à des modèles (ajout d’un champ, suppression d’un modèle, etc.) dans un schéma de base de données.[[*](https://docs.djangoproject.com/fr/3.2/topics/migrations/)]
 
-Nous avons l'arborescence de notre site :
+Nous obtenons l'arborescence suivante :
 ```
 .
 ├── manage.py
@@ -476,7 +489,7 @@ Nous avons l'arborescence de notre site :
     ├── dev.txt
     └── prod.txt
 ```
-Des étapes sont nécessaire pour ajouter nos applications nouvellement crée au serveur Django, elles sont très bien expliquée sur la [vidéo suivante](https://www.youtube.com/watch?v=PqeAvFf_HDI) : 
+D'autre étapes sont nécessaires pour ajouter nos applications nouvellement crées au serveur Django, elles sont très bien expliquée sur la [vidéo suivante](https://www.youtube.com/watch?v=PqeAvFf_HDI).
 
 - Arborescence détaillée du serveur Django :
 ```
@@ -536,12 +549,12 @@ La base de notre serveur est en place.
 Cette base de donnée permettra de garder en mémoire les données reçu du broker MQTT, et ce même après avoir éteint le serveur.
 &emsp;De plus lors de la réception d'un message du broker MQTT, la donnée sera directement ajoutée dans la base de donnée. Et ensuite des requêtes vers cette base de donnée seront effectuée pour récupérer des valeurs et les affichées sur le site, mais nous verrons cela plus tard.
 
-Notre base de donnée contient une unique table contenant les attributs suivant : 
-- Un identifiant unique s'incrémentant à chaque nouvelle entité.
+Notre base de donnée est formée d'une unique table contenant les attributs suivant : 
+- Un identifiant unique et implicite s'incrémentant à chaque nouvelle entité.
 - Une chaine de caractère *id_esp* symbolisant l'identifiant de l'esp d'où provient la valeurs
     (ne travaillant avec un unique esp, nous l'avons identifié par esp-test, mais nous pourrons récupérer l'identifiant via le broker à terme)
 - Une date de publication *pub_date* si nous voulons réaliser une requête sur une interval de date, mais ce type de requête n'est pas encore implémenter
-- Un entier symbolisant la valeurs de la photorésistance 
+- Un entier symbolisant la valeurs de la photorésistance
 
 Cette table a été défini dans le fichier [*/myapp/models.py*](website/myapp/models.py) de la manière suivante :
 
@@ -560,7 +573,7 @@ class Data(models.Model):
 
 Nous avons besoin de migré la table après création comme indiqué dans la [vidéo suivante](https://www.youtube.com/watch?v=PqeAvFf_HDI) précédement utilisée.
 
-Les nouvelles entités sont créer à la réception d'un message du broker, et sont utilisée lors de l'affichage de la page HTML, ces deux aspects seront explicités ultérieurement.
+Les nouvelles entités sont crées à la réception d'un message du broker MQTT, et sont utilisées lors de l'affichage de la page HTML, ces deux aspects seront explicités ultérieurement.
 
 - Avantages :
   - pérsistance des données
@@ -575,11 +588,11 @@ Les nouvelles entités sont créer à la réception d'un message du broker, et s
 - Inconvénients :
   - La table ne se vide pas automatiquement, mais cela peut etre implémenter si nous avons des données plus conséquentes. Cela peut etre problématique si le serveur est lancé en permanence, il créé une nouvelle entité toutes les seconds.
 
-Nous verrons maintenant comment cette base de données est remplie.
+Notre base de donnée étant opérationnelle, comme la remplissons nous ?
 
-## connection entre la base de donnée et l'esp via le broker
+## connection entre la base de donnée et l'esp32 via le broker MQTT
 
-Nous avons maintenant le coeur de notre site opérationnel, il nous faut maintenant récupérer les données de notre broker MQTT, et les ajouter dans la base de donnée. Pour celà nous utiliserons la librarie python [*paho-mqtt*](https://pypi.org/project/paho-mqtt/).
+&emsp;Nous avons maintenant le coeur de notre site opérationnel, il nous faut maintenant récupérer les données de notre broker MQTT, et les ajouter dans la base de donnée. Pour celà nous utiliserons la librarie python [*paho-mqtt*](https://pypi.org/project/paho-mqtt/).
 Nous devons donc d'abord installer la libraire :
 `pip install paho-mqtt`
 
@@ -592,6 +605,8 @@ Nous voulons lancer la connection au démarrage du serveur, la reception des mes
 Les méthodes appelés dans *\_\_init__* sont lancée au démarrage du serveur, et ce quoi qu'il arrive.
 
 Nous avons d'abord créé un fichier [myapp/output.py](website/myapp/output.py) pour gérer les données entrante sur le serveur (c'est à dire sortante de l'esp32 sur le topic *esp32/output*).
+
+ATTENTION : Le fichier \_\_init__.py s'éxecute très "tôt" au lancement du serveur, et ce même avant que toutes les applications soient chargée. Cela provoquera un problème lors que nous voulons importer le modèle de notre table (*models.py*) dans \_\_init.__py. Le models n'étant pas initialisé, nous obtenons une erreur `Apps aren't loaded yet`/
 
 ```py
 # after conenecting to the MQTT broker
@@ -621,17 +636,16 @@ client.connect("192.168.1.46", 1883)
 
 ```
 
-Nous faisons l'import de la Table *Data* dans la méthode car au lancement du serveur, les apps ne sont pas chargée de suite, il en est de même pour la table et de ce fait, l'import n'était pas reconnu.
+Nous faisons l'import de la Table *Data* dans la méthode car au lancement du serveur, les apps ne sont pas chargée de suite, il en est de même pour la table et de ce fait, l'import n'était pas reconnu. De ce fait l'import se fera lors de la connection, qui se fera forcément après que le serveur soit totalement opérationnel et que toutes les ressources soient chargées.
 
-Lors de la connection au broker, nous nous abonnons au topic `esp32/output` pour recevoir les données de l'esp32.
-
+&emsp;Lors de la connection au broker, nous nous abonnons au topic `esp32/output` pour recevoir les données de l'esp32.
 &emsp;Lors de la réception d'un message, nous créons une nouvelle entité dans notre table avec la valeurs récupérée du message. L'identifiant de l'esp32 est entré "*en dur*" pour le moment, mais nous pouvons utilisé le champs *userdata* pour avoir un identifiant plus cohérent.
 
 L'adresse du broker est également entrée "*en dur*", il serait fortement envisageable de la paramétrée au lancement du serveur Django via des arguments, ou une lecture de fichier.
 
 Dans le fichier [/myapp/\_\_init__.py](website/myapp/__init__.py), nous appelons `mqtt_output.client.loop_start()` afin de lancer la boucle d'attente des messages.
 
-Nous noterons la grande similarité des méthodes entre le code sur l'esp32 et celui ci : on_message <-> callback; mqtt_output.client.loop_start() <-> client.loop() etc ...
+Nous noterons la grande similarité des méthodes entre le code sur l'esp32 et celui ci : `on_message` <-> `callback`; `client.loop_start()` <-> `client.loop()` etc ...
 
 Notre base de donnée se rempli au fur et à mesure de la réception des messages.
 
@@ -641,11 +655,15 @@ Si un message arrive sur le topic `esp32/output` contenant autre chose qu'un ent
 
 Attention, à partir de ce moment nous avons besoin d'ajouter le flag `--noreload` lors du lancement du serveur. Autrement le serveur essayais de s'abonner au topic à nouveau, et nous recevions tous les messages deux fois.
 
+`./manage.py runserver -noreload`
+
 ### esp32/input
 
-Nous voulons à présent envoyer des données depuis le site web vers l'esp32, pour cela nous utiliserons le topic `esp32/input`.
+&emsp;Nous voulons à présent envoyer des données depuis le site web vers l'esp32, pour cela nous utiliserons le topic `esp32/input`.
 
-Nous utiliserons à nouveau la librairie paho-mqtt, mais cette fois-ci en javascript : 
+Nous avons essayer d'implémenter cette fonctionnalité en Javascript, initialement avec un switch "On" "Off" allumant et éteignant la Led.
+
+Pour ce faire nous utilisions la librairie paho-mqtt, mais cette fois-ci en javascript : 
 
 ```js
 jQuery(document).ready(function($) {
@@ -693,13 +711,12 @@ jQuery(document).ready(function($) {
 });
 ```
 &emsp;Nous remarquons qu'une fois de plus les méthodes sont similaire aux précédentes implémentations.
-Malheuresement cette implémentation ne fonctionnait pas, les connections au broker MQTT étaient refusée et nous n'avons pas réussi à résoudre le problème.
+Malheuresement cette implémentation s'est révélée infructueuse:
+En effet, la connection établie pour l'envoie de message était "*anonyme*", cette dernière était refusée par le broker MQTT. Et même en changeant la configuration du broker Mosquitto (via `mosquitto.conf`), en spécifiant que nous acceptions les connections anonymes, les connections au broker MQTT étaient tout de même refusée et nous n'arrivions pas à résoudre le problème.
 
-&emsp;Nous avons donc décidé d'implémenter l'envoie de commande à la réception d'une requete "*POST*".
-Nous avons un entrelacement du *front end* provenant du fichier HTML, avec le *back end* gérer par le serveur Django.
-Nous utiliserons un [formulaire HTML](https://docs.djangoproject.com/fr/2.2/topics/forms/).
-
+&emsp;Nous avons donc décider d'implémenter cette fonctionnalité en envoyant une requête "POST" depuis un [formulaire](https://docs.djangoproject.com/fr/2.2/topics/forms/) sur la page HTML. Cette requête étant ensuite récupérée et traitée dans [/myappp/views.py](website/myapp/views.py).
 ```html
+<!-- Formulaire pour esp32/input -->
 <form method="post">
     {%csrf_token%}
     <label for="input">Veuillez entrer une commande : </label>
@@ -714,7 +731,7 @@ Cette commande affichera ce super message sur notre écran :
 
 <img src="img/OledExample.jpg" width=400/>
 
-Lorsque l'utilisateur entre des données dans le formulaire, une requete "*POST*" est envoyée, cette dernières est récupérée dans [/myappp/views.py](website/myapp/views.py) :
+Lorsque l'utilisateur entre un message (une commande) dans le formulaire, une requete "*POST*" est envoyée, cette dernières est récupérée dans [/myappp/views.py](website/myapp/views.py) :
 
 ```py
 def index(request):
@@ -730,7 +747,7 @@ def index(request):
   return render(request, "index.html", {f"value": data.value})
 ```
 
-&emsp;Vu que nous n'avons pas besoin de maintenir une connection constante avec le broker,  les envoies de commandes étant isolés, nous utilisons `publish.single()`. Cela permettra d'établir une connection d'envoyer le message et de se déconnecté juste après.
+&emsp;Vu que nous n'avons pas besoin de maintenir une connection constante avec le broker,  les envoies de commandes étant isolés, nous utilisons `publish.single()`. Cela permettra d'établir une connection d'envoyer le message et de se déconnecter juste après.
 
 - Inconvénients :
   - Lors d'un envoie de commande, un nouveau rendu de la page est réalisé ce qui provoque une *actualisation*.
@@ -738,6 +755,7 @@ def index(request):
 
 - Idée de fonctionnalité :
   - Ajouter une table supplémentaire contenant l'historique des commandes.
+  - Ajouter un champs permettant de choisir vers quel ESP32 nous voulons envoyé la commande
 
 ## Javascript et frontend
 
